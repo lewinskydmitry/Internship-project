@@ -6,6 +6,27 @@ from catboost import CatBoostClassifier
 from tqdm import tqdm
 from catboost import Pool
 from sklearn.model_selection import train_test_split
+import torch.nn as nn
+from torch.utils.data import Subset
+
+class Model_class(nn.Module):
+    def __init__(self, model, device):
+        super().__init__()
+        self.model = model
+        self.device = device
+        
+    def __call__(self, x):
+        return self.model(x)
+
+
+class Loss_class:
+    def __init__(self,loss):
+        self.loss = loss
+        
+    def __call__(self, y_pred, y_true):
+        out = self.loss(y_pred, y_true)
+        accuracy = (y_pred.argmax(dim=1) == y_true).float().mean()
+        return out, {'loss': out.item(), 'accuracy': accuracy.item()}
 
 
 def upsampling(X_train, y_train):
@@ -62,3 +83,15 @@ def search_num_features(df, feature_importance, upsamp_func = False, step = 3):
     if acc < acc_current:
       acc = acc_current
   print(f'Best AUC - {best_score}, num_features - {best_num_features}, acc = {acc}')
+
+
+def balance_val_split(dataset, val_split=0.7):
+    targets = np.array(dataset.targets)
+    train_indices, val_indices = train_test_split(
+        np.arange(targets.shape[0]),
+        test_size=val_split,
+        stratify=targets
+    )
+    train_dataset = Subset(dataset, indices=train_indices)
+    val_dataset = Subset(dataset, indices=val_indices)
+    return train_dataset, val_dataset

@@ -5,6 +5,7 @@ from torch.utils.data import Dataset
 class TableDataset(Dataset):
     def __init__(self, data_file):
         self.data = pd.read_csv(data_file)
+        self.targets = self.data[self.data.columns[-1]]
     
     def __len__(self):
         return len(self.data)
