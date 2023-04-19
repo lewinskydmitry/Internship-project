@@ -9,6 +9,8 @@ from sklearn.model_selection import train_test_split
 import torch.nn as nn
 from torch.utils.data import Subset
 
+from torch.utils.data.sampler import RandomSampler, WeightedRandomSampler
+
 
 def upsampling(X_train, y_train):
   df = pd.concat([X_train, y_train],axis = 1)
@@ -31,11 +33,13 @@ def upsampling(X_train, y_train):
 
 
 def check_result(model,X_test,y_test):
+  metrics_dict = {}
   fpr, tpr, thresholds = metrics.roc_curve(y_test, model.predict(X_test))
-  result = metrics.auc(fpr, tpr)
-  f1_sc = f1_score(y_test, model.predict(X_test))
-  print(f'F1_score = {f1_sc}, AUC = {result}')
-  return result
+  auc_score = metrics.auc(fpr, tpr)
+  f1_sc = f1_score(y_test, model.predict(X_test), average='macro')
+  metrics_dict['auc_score'] = auc_score
+  metrics_dict['f1_score'] = f1_sc
+  return metrics_dict
 
 
 def search_num_features(df, feature_importance, upsamp_func = False, step = 5):
@@ -56,14 +60,12 @@ def search_num_features(df, feature_importance, upsamp_func = False, step = 5):
     train_pool = Pool(data=X_train, label=y_train)
     CatBoost = CatBoostClassifier(verbose=False)
     CatBoost.fit(train_pool)
-    metric = check_result(CatBoost, X_test, y_test)
-    f1_current = f1_score(y_test, CatBoost.predict(X_test))
-    if metric > best_score:
-      best_score = metric
+    metrics_dict = check_result(CatBoost, X_test, y_test)
+    print(f'F1_score - {metrics_dict["f1_score"]}, num_features - {best_num_features}, AUC_score = {metrics_dict["auc_score"]}')
+    if metrics_dict['f1_score'] > best_score:
+      best_score = metrics_dict['f1_score']
       best_num_features = num_col
-    if f1_sc < f1_current:
-      f1_sc = f1_current
-  print(f'Best AUC - {best_score}, num_features - {best_num_features}, F1_score = {f1_sc}')
+  print(f'Best F1_score - {best_score}, num_features - {best_num_features}')
 
 ###########################################################################################
 
@@ -84,16 +86,21 @@ class Loss_class:
     def __call__(self, y_pred, y_true):
         out = self.loss(y_pred, y_true)
         accuracy = (y_pred.argmax(dim=1) == y_true).float().mean()
-        return out, {'loss': out.item(), 'accuracy': accuracy.item()}
+        f1_sc = f1_score(y_true.cpu(), y_pred.argmax(dim=1).cpu(),average='macro')
+        fpr, tpr, _ = metrics.roc_curve(y_true, y_pred.argmax(dim=1).cpu())
+        auc_score = metrics.auc(fpr, tpr)
+        return out, {'loss': out.item(), 'accuracy': accuracy.item(), 'f1_score': f1_sc, 'auc_score':auc_score}
 
 
-def balance_val_split(dataset, val_split=0.7):
+def balance_val_split(dataset, train_size=0.7):
     targets = np.array(dataset.targets)
     train_indices, val_indices = train_test_split(
         np.arange(targets.shape[0]),
-        test_size=val_split,
+        shuffle=True,
+        train_size=train_size,
         stratify=targets
     )
+
     train_dataset = Subset(dataset, indices=train_indices)
     val_dataset = Subset(dataset, indices=val_indices)
     return train_dataset, val_dataset

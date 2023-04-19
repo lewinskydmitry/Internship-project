@@ -1,0 +1,41 @@
+{
+    "os": "macOS-10.16-x86_64-i386-64bit",
+    "python": "3.9.15",
+    "heartbeatAt": "2023-04-19T11:46:13.430085",
+    "startedAt": "2023-04-19T11:46:12.473333",
+    "docker": null,
+    "cuda": null,
+    "args": null,
+    "state": "running",
+    "program": "<python with no main file>",
+    "git": {
+        "remote": "https://github.com/lewinskydmitry/Internship_project.git",
+        "commit": "32ebfc4d7f77091f9090a0054b67e406869db0a0"
+    },
+    "email": "61576391+lewinskydmitry@users.noreply.github.com",
+    "root": "/Users/fomindmitry/Google \u0414\u0438\u0441\u043a/Github/Internship_project",
+    "host": "MacBook-Pro-Fomin.local",
+    "username": "fomindmitry",
+    "executable": "/opt/miniconda3/envs/env1/bin/python",
+    "cpu_count": 4,
+    "cpu_count_logical": 8,
+    "cpu_freq": {
+        "current": 1400,
+        "min": 1400,
+        "max": 1400
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 1400,
+            "min": 1400,
+            "max": 1400
+        }
+    ],
+    "disk": {
+        "total": 233.46913528442383,
+        "used": 71.10316848754883
+    },
+    "memory": {
+        "total": 16.0
+    }
+}
