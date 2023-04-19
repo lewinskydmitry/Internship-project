@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import f1_score
 from sklearn import metrics
 from catboost import CatBoostClassifier
 from tqdm import tqdm
@@ -8,25 +8,6 @@ from catboost import Pool
 from sklearn.model_selection import train_test_split
 import torch.nn as nn
 from torch.utils.data import Subset
-
-class Model_class(nn.Module):
-    def __init__(self, model, device):
-        super().__init__()
-        self.model = model
-        self.device = device
-        
-    def __call__(self, x):
-        return self.model(x)
-
-
-class Loss_class:
-    def __init__(self,loss):
-        self.loss = loss
-        
-    def __call__(self, y_pred, y_true):
-        out = self.loss(y_pred, y_true)
-        accuracy = (y_pred.argmax(dim=1) == y_true).float().mean()
-        return out, {'loss': out.item(), 'accuracy': accuracy.item()}
 
 
 def upsampling(X_train, y_train):
@@ -52,15 +33,15 @@ def upsampling(X_train, y_train):
 def check_result(model,X_test,y_test):
   fpr, tpr, thresholds = metrics.roc_curve(y_test, model.predict(X_test))
   result = metrics.auc(fpr, tpr)
-  acc = accuracy_score(y_test, model.predict(X_test))
-  print(f'Accuracy = {acc}, AUC = {result}')
+  f1_sc = f1_score(y_test, model.predict(X_test))
+  print(f'F1_score = {f1_sc}, AUC = {result}')
   return result
 
 
-def search_num_features(df, feature_importance, upsamp_func = False, step = 3):
+def search_num_features(df, feature_importance, upsamp_func = False, step = 5):
   best_score = 0
   best_num_features = 0
-  acc = 0
+  f1_sc = 0
   for num_col in tqdm(range(1, len(feature_importance), step)):
     features = list(feature_importance.iloc[:num_col,:]['feature_names'])
     data = df[features + ['Machine failure']]
@@ -76,13 +57,34 @@ def search_num_features(df, feature_importance, upsamp_func = False, step = 3):
     CatBoost = CatBoostClassifier(verbose=False)
     CatBoost.fit(train_pool)
     metric = check_result(CatBoost, X_test, y_test)
-    acc_current = accuracy_score(y_test, CatBoost.predict(X_test))
+    f1_current = f1_score(y_test, CatBoost.predict(X_test))
     if metric > best_score:
       best_score = metric
       best_num_features = num_col
-    if acc < acc_current:
-      acc = acc_current
-  print(f'Best AUC - {best_score}, num_features - {best_num_features}, acc = {acc}')
+    if f1_sc < f1_current:
+      f1_sc = f1_current
+  print(f'Best AUC - {best_score}, num_features - {best_num_features}, F1_score = {f1_sc}')
+
+###########################################################################################
+
+class Model_class(nn.Module):
+    def __init__(self, model, device):
+        super().__init__()
+        self.model = model
+        self.device = device
+        
+    def __call__(self, x):
+        return self.model(x)
+
+
+class Loss_class:
+    def __init__(self,loss):
+        self.loss = loss
+        
+    def __call__(self, y_pred, y_true):
+        out = self.loss(y_pred, y_true)
+        accuracy = (y_pred.argmax(dim=1) == y_true).float().mean()
+        return out, {'loss': out.item(), 'accuracy': accuracy.item()}
 
 
 def balance_val_split(dataset, val_split=0.7):
