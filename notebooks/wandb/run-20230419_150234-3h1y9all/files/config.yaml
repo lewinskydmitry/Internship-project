@@ -1,0 +1,54 @@
+wandb_version: 1
+
+_wandb:
+  desc: null
+  value:
+    cli_version: 0.13.6
+    framework: catboost
+    is_jupyter_run: true
+    is_kaggle_kernel: false
+    python_version: 3.9.15
+    start_time: 1681909354.577699
+    t:
+      1:
+      - 1
+      - 5
+      - 7
+      - 53
+      - 55
+      2:
+      - 1
+      - 5
+      - 7
+      - 53
+      - 55
+      3:
+      - 2
+      - 3
+      - 13
+      - 23
+      4: 3.9.15
+      5: 0.13.6
+      8:
+      - 1
+      - 5
+device:
+  desc: null
+  value: cpu
+gamma:
+  desc: null
+  value: 0.9
+lr:
+  desc: null
+  value: 0.01
+model:
+  desc: null
+  value: "Sequential(\n  (0): Linear(in_features=10, out_features=240, bias=True)\n\
+    \  (1): ReLU()\n  (2): Linear(in_features=240, out_features=500, bias=True)\n\
+    \  (3): ReLU()\n  (4): Linear(in_features=500, out_features=240, bias=True)\n\
+    \  (5): ReLU()\n  (6): Linear(in_features=240, out_features=120, bias=True)\n\
+    \  (7): ReLU()\n  (8): Linear(in_features=120, out_features=10, bias=True)\n \
+    \ (9): ReLU()\n  (10): Linear(in_features=10, out_features=2, bias=True)\n)"
+weight_decay:
+  desc: null
+  value: 0.001

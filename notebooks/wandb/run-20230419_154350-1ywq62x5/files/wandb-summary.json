@@ -1,0 +1,1 @@
+{"epoch": 36, "train_loss": 0.682682779232661, "train_accuracy": 0.9661333342393239, "train_f1_score": 0.571306077928946, "train_auc_score": NaN, "test_loss": 0.683252694606781, "test_accuracy": 0.9660000002384186, "test_f1_score": 0.5712739613348093, "test_auc_score": NaN, "lr": 0.00020275559590445286, "_timestamp": 1681912189.931179, "_runtime": 359.7793221473694, "_step": 36}

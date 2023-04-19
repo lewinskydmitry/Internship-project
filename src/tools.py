@@ -8,12 +8,12 @@ from catboost import Pool
 from sklearn.model_selection import train_test_split
 import torch.nn as nn
 from torch.utils.data import Subset
+import torch
 
 from torch.utils.data.sampler import RandomSampler, WeightedRandomSampler
 
 
-def upsampling(X_train, y_train):
-  df = pd.concat([X_train, y_train],axis = 1)
+def upsampling(df):
   # Count the number of samples in each class
   class_counts = df['Machine failure'].value_counts()
 
@@ -29,7 +29,7 @@ def upsampling(X_train, y_train):
 
   # Shuffle the upsampled data
   upsampled_df = upsampled_df.sample(frac=1).reset_index(drop = True)
-  return upsampled_df.drop(columns = ['Machine failure']), upsampled_df['Machine failure']
+  return upsampled_df
 
 
 def check_result(model,X_test,y_test):
@@ -84,12 +84,16 @@ class Loss_class:
         self.loss = loss
         
     def __call__(self, y_pred, y_true):
-        out = self.loss(y_pred, y_true)
-        accuracy = (y_pred.argmax(dim=1) == y_true).float().mean()
-        f1_sc = f1_score(y_true.cpu(), y_pred.argmax(dim=1).cpu(),average='macro')
-        fpr, tpr, _ = metrics.roc_curve(y_true, y_pred.argmax(dim=1).cpu())
-        auc_score = metrics.auc(fpr, tpr)
-        return out, {'loss': out.item(), 'accuracy': accuracy.item(), 'f1_score': f1_sc, 'auc_score':auc_score}
+      out = self.loss(y_pred, y_true)
+      y_pred = torch.softmax(y_pred, dim=1)
+      accuracy = (y_pred.argmax(dim=1) == y_true).float().mean()
+      f1_sc = f1_score(y_true.cpu(), y_pred.argmax(dim=1).cpu(), average='macro')
+      y_pred = y_pred.detach().cpu().numpy()
+      y_true = y_true.cpu().numpy()
+      fpr, tpr, _ = metrics.roc_curve(y_true, y_pred[:, 1])
+      auc_score = metrics.auc(fpr, tpr)
+      return out, {'loss': out.item(), 'accuracy': accuracy.item(), 'f1_score': f1_sc, 'auc_score': auc_score}
+
 
 
 def balance_val_split(dataset, train_size=0.7):
