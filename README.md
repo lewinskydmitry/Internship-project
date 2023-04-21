@@ -1,2 +1,2 @@
-# Internship_project
+# Internship-project
  Internship project UGA
