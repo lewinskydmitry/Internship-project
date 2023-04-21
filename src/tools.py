@@ -10,26 +10,45 @@ import torch.nn as nn
 from torch.utils.data import Subset
 import torch
 
-from torch.utils.data.sampler import RandomSampler, WeightedRandomSampler
 
+def upsampling(*data):
+  if len(data) == 1:
+    # Count the number of samples in each class
+    df = data[0]
+    class_counts = df['Machine failure'].value_counts()
 
-def upsampling(df):
-  # Count the number of samples in each class
-  class_counts = df['Machine failure'].value_counts()
+    # Determine the minority and majority class
+    minority_class = class_counts.idxmin()
+    majority_class = class_counts.idxmax()
 
-  # Determine the minority and majority class
-  minority_class = class_counts.idxmin()
-  majority_class = class_counts.idxmax()
+    # Upsample the minority class with replacement
+    minority_df = df[df['Machine failure'] == minority_class]
+    upsampled_df = pd.concat(
+        [df] + [minority_df.sample(n=class_counts[majority_class] - class_counts[minority_class],
+                                  replace=True)], axis=0)
 
-  # Upsample the minority class with replacement
-  minority_df = df[df['Machine failure'] == minority_class]
-  upsampled_df = pd.concat(
-      [df] + [minority_df.sample(n=class_counts[majority_class] - class_counts[minority_class],
-                                replace=True)], axis=0)
+    # Shuffle the upsampled data
+    upsampled_df = upsampled_df.sample(frac=1).reset_index(drop = True)
+    return upsampled_df
+  else:
+    df = pd.concat([data[0], data[1]], axis=1)
+    # Count the number of samples in each class
+    class_counts = df['Machine failure'].value_counts()
 
-  # Shuffle the upsampled data
-  upsampled_df = upsampled_df.sample(frac=1).reset_index(drop = True)
-  return upsampled_df
+    # Determine the minority and majority class
+    minority_class = class_counts.idxmin()
+    majority_class = class_counts.idxmax()
+
+    # Upsample the minority class with replacement
+    minority_df = df[df['Machine failure'] == minority_class]
+    upsampled_df = pd.concat(
+        [df] + [minority_df.sample(n=class_counts[majority_class] - class_counts[minority_class],
+                                  replace=True)], axis=0)
+
+    # Shuffle the upsampled data
+    upsampled_df = upsampled_df.sample(frac=1).reset_index(drop = True)
+    return upsampled_df.drop(columns = ['Machine failure']), upsampled_df['Machine failure']
+  
 
 
 def check_result(model,X_test,y_test):
@@ -45,7 +64,6 @@ def check_result(model,X_test,y_test):
 def search_num_features(df, feature_importance, upsamp_func = False, step = 5):
   best_score = 0
   best_num_features = 0
-  f1_sc = 0
   for num_col in tqdm(range(1, len(feature_importance), step)):
     features = list(feature_importance.iloc[:num_col,:]['feature_names'])
     data = df[features + ['Machine failure']]
@@ -91,7 +109,6 @@ class Loss_class:
       y_pred = y_pred.detach().cpu().numpy()
       y_true = y_true.cpu().numpy()
       fpr, tpr, _ = metrics.roc_curve(y_true, y_pred[:, 1])
-      
       auc_score = metrics.auc(fpr, tpr)
       return out, {'loss': out.item(), 'accuracy': accuracy.item(), 'f1_score': f1_sc, 'auc_score': auc_score}
 
