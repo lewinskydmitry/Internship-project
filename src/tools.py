@@ -91,6 +91,7 @@ class Loss_class:
       y_pred = y_pred.detach().cpu().numpy()
       y_true = y_true.cpu().numpy()
       fpr, tpr, _ = metrics.roc_curve(y_true, y_pred[:, 1])
+      
       auc_score = metrics.auc(fpr, tpr)
       return out, {'loss': out.item(), 'accuracy': accuracy.item(), 'f1_score': f1_sc, 'auc_score': auc_score}
 
