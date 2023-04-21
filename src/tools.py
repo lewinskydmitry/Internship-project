@@ -11,7 +11,7 @@ from torch.utils.data import Subset
 import torch
 
 
-def upsampling(*data):
+def upsampling(p=1., *data):
   if len(data) == 1:
     # Count the number of samples in each class
     df = data[0]
@@ -24,7 +24,7 @@ def upsampling(*data):
     # Upsample the minority class with replacement
     minority_df = df[df['Machine failure'] == minority_class]
     upsampled_df = pd.concat(
-        [df] + [minority_df.sample(n=class_counts[majority_class] - class_counts[minority_class],
+        [df] + [minority_df.sample(n=int((class_counts[majority_class] - class_counts[minority_class])*p),
                                   replace=True)], axis=0)
 
     # Shuffle the upsampled data
@@ -42,7 +42,7 @@ def upsampling(*data):
     # Upsample the minority class with replacement
     minority_df = df[df['Machine failure'] == minority_class]
     upsampled_df = pd.concat(
-        [df] + [minority_df.sample(n=class_counts[majority_class] - class_counts[minority_class],
+        [df] + [minority_df.sample(n=int((class_counts[majority_class] - class_counts[minority_class])*p),
                                   replace=True)], axis=0)
 
     # Shuffle the upsampled data

@@ -59,7 +59,7 @@ class Trainer:
         # initializing metrics
         self.metrics = None
         self.init_metrics()
-        
+
 
     @staticmethod
     def log_hyperparams(wandb_init_params, **hyperparams):
