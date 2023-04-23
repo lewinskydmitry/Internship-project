@@ -98,7 +98,7 @@ class Trainer:
                 log_path = self.model_dir + name + ".pth"
                 torch.save(self.model.state_dict(), log_path)
                 model_artifact.add_file(log_path)
-                wandb.save(log_path)
+                wandb.save(log_path, base_path = self.wandb_init_params['dir'])
 
                 self.run.log_artifact(model_artifact)
             self.update_metrics(epoch=epoch, 
