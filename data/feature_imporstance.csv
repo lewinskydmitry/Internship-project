@@ -1,121 +1,122 @@
 feature_importance,feature_names
-9.82236946386312,Rotational speed [rpm]^2*Torque [Nm]^2
-8.536235778629294,Rotational speed [rpm]*Torque [Nm]
-2.6463786641302227,Torque [Nm]^2*Tool wear [min]^2
-2.62082893938596,Torque [Nm]*Tool wear [min]
-2.1740970069665724,Air temperature [K]*Rotational speed [rpm]^2
-2.076662925626653,Process temperature [K]*Rotational speed [rpm]^2
-2.0710812935679415,Torque [Nm]*Air temperature [K]^2
-1.8437994364035704,Process temperature [K]*Rotational speed [rpm]
-1.796405661514584,Difference_of_temperature *Rotational speed [rpm]^2
-1.6665428072624429,Rotational speed [rpm]*Difference_of_temperature ^2
-1.5929110305805163,Rotational speed [rpm]*Rotational speed [rpm]^2
-1.5810927308782479,Process temperature [K]*Difference_of_temperature 
-1.5392667537801954,Torque [Nm]*Difference_of_temperature ^2
-1.538813029993296,Rotational speed [rpm]^2
-1.5386056336329796,Air temperature [K]^2*Tool wear [min]^2
-1.5332232248699884,Difference_of_temperature 
-1.5143345591273287,Torque [Nm]*Tool wear [min]^2
-1.483323389177644,Torque [Nm]*Rotational speed [rpm]^2
-1.4573809278093355,Process temperature [K]*Torque [Nm]^2
-1.3557911156625142,Air temperature [K]*Difference_of_temperature 
-1.3271973857899904,Process temperature [K]*Torque [Nm]
-1.2758023044860587,Rotational speed [rpm]^2*Difference_of_temperature ^2
-1.2648637144543329,Process temperature [K]^2*Difference_of_temperature ^2
-1.2275290178085505,Tool wear [min]^2
-1.2066784298917945,Difference_of_temperature *Tool wear [min]^2
-1.1684916254124584,Air temperature [K]^2*Difference_of_temperature ^2
-1.153520333480888,Rotational speed [rpm]
-1.152270314626568,Process temperature [K]^2*Rotational speed [rpm]^2
-1.1445997444136653,Process temperature [K]*Difference_of_temperature ^2
-1.1436239875637904,Tool wear [min]*Tool wear [min]^2
-1.1429138648077504,Torque [Nm]*Torque [Nm]^2
-1.1320494930346068,Tool wear [min]*Torque [Nm]^2
-1.1150577176839227,Difference_of_temperature *Torque [Nm]^2
-1.1076717646249092,Air temperature [K]*Difference_of_temperature ^2
-0.9898484164221178,Difference_of_temperature *Difference_of_temperature ^2
-0.903060117071097,Tool wear [min]*Rotational speed [rpm]^2
-0.8946397682747258,Air temperature [K]*Air temperature [K]^2
-0.8738510360071704,Rotational speed [rpm]*Process temperature [K]^2
-0.8709991215796261,Tool wear [min]*Process temperature [K]^2
-0.8700087083501716,Rotational speed [rpm]*Tool wear [min]
-0.8660841605318083,Process temperature [K]^2*Tool wear [min]^2
-0.8243037650639808,Rotational speed [rpm]*Torque [Nm]^2
-0.8162393515384395,Air temperature [K]*Tool wear [min]^2
-0.8120973780031487,Tool wear [min]
-0.8044935361604343,Air temperature [K]*Torque [Nm]
-0.7547108408101953,Torque [Nm]*Difference_of_temperature 
-0.7477171306504066,Torque [Nm]*Process temperature [K]^2
-0.7162051402467322,Rotational speed [rpm]*Air temperature [K]^2
-0.7009543649911452,Rotational speed [rpm]*Difference_of_temperature 
-0.6999427229464426,Tool wear [min]*Difference_of_temperature ^2
-0.6798759679683213,Air temperature [K]*Rotational speed [rpm]
-0.6733571394621551,Rotational speed [rpm]*Tool wear [min]^2
-0.655247555184999,Tool wear [min]*Difference_of_temperature 
-0.6487474750206537,Tool wear [min]*Type_L
-0.6442567916633712,Rotational speed [rpm]^2*Tool wear [min]^2
-0.6212489864099893,Torque [Nm]^2
-0.6190883255049116,Process temperature [K]^2*Torque [Nm]^2
-0.610011046863639,Type_L*Rotational speed [rpm]^2
-0.6009648995124006,Difference_of_temperature *Air temperature [K]^2
-0.5376225691714882,Torque [Nm]
-0.5327866939529856,Process temperature [K]*Tool wear [min]
-0.5309609630375375,Air temperature [K]*Tool wear [min]
-0.5254252891432216,Tool wear [min]*Air temperature [K]^2
-0.5158166594196618,Rotational speed [rpm]*Type_L
-0.505873811310682,Air temperature [K]^2*Rotational speed [rpm]^2
-0.4889895988206791,Type_M*Torque [Nm]^2
-0.48817771684880074,Difference_of_temperature *Process temperature [K]^2
-0.4869624152405649,Torque [Nm]*Type_M
-0.458880179994393,Type_L*Tool wear [min]^2
-0.4486529018169615,Torque [Nm]^2*Difference_of_temperature ^2
-0.44396337278480513,Difference_of_temperature ^2
-0.44261402122336946,Air temperature [K]*Process temperature [K]^2
-0.42046623917134635,Air temperature [K]*Process temperature [K]
-0.39595136201229536,Air temperature [K]^2
-0.39577228867445596,Process temperature [K]^2
-0.3791351784267801,Air temperature [K]*Torque [Nm]^2
-0.3712772891634797,Process temperature [K]*Air temperature [K]^2
-0.34632264695579396,Process temperature [K]*Tool wear [min]^2
-0.293394260701376,Tool wear [min]^2*Difference_of_temperature ^2
-0.2725330913236044,Process temperature [K]*Process temperature [K]^2
-0.2612332661005018,Air temperature [K]^2*Process temperature [K]^2
-0.2561311458138064,Torque [Nm]*Type_L
-0.25599969119244526,Type_M*Difference_of_temperature ^2
-0.2548223010571704,Type_L*Difference_of_temperature ^2
-0.24453769697784927,Type_M*Tool wear [min]^2
-0.2396757589349136,Type_M*Air temperature [K]^2
-0.21657154504630013,Process temperature [K]
-0.18891963596280206,Difference_of_temperature *Type_L
-0.18642926148176545,Type_H*Rotational speed [rpm]^2
-0.18528979548518038,Type_L*Torque [Nm]^2
-0.1827004146523919,Tool wear [min]*Type_M
-0.1755186356555015,Rotational speed [rpm]*Type_H
-0.17346996893276562,Rotational speed [rpm]*Type_M
-0.16867934390292585,Air temperature [K]*Type_M
-0.16575020721314787,Difference_of_temperature *Type_H
-0.15590396561837175,Air temperature [K]^2*Torque [Nm]^2
-0.14226027353361842,Air temperature [K]
-0.13263668730545036,Type_H*Difference_of_temperature ^2
-0.12462374028131591,Type_M*Rotational speed [rpm]^2
-0.12436878252521946,Difference_of_temperature *Type_M
-0.11524836212384694,Type_H*Tool wear [min]^2
-0.11503884693115024,Type_L*Process temperature [K]^2
-0.11229420118189927,Type_L*Air temperature [K]^2
-0.1026336293340425,Tool wear [min]*Type_H
-0.1012994934293648,Air temperature [K]*Type_L
-0.0953523501303715,Type_M*Process temperature [K]^2
-0.09249431104487685,Type_H*Torque [Nm]^2
-0.07387005386145881,Torque [Nm]*Type_H
-0.06883664167826964,Process temperature [K]*Type_M
-0.06509614256149857,Process temperature [K]*Type_L
-0.052366087564402655,Type_H*Air temperature [K]^2
-0.020014113271832827,Type_H*Process temperature [K]^2
-0.01113964518530872,Air temperature [K]*Type_H
-0.007847637654164822,Process temperature [K]*Type_H
-0.0,Type_H*Type_L
-0.0,Type_L*Type_M
-0.0,Type_M
+16.411231980247095,Rotational speed [rpm]*Torque [Nm]
+6.005219532894115,Torque [Nm]*Tool wear [min]
+5.54616680275306,Torque [Nm]+Tool wear [min]
+3.542460288416031,Air temperature [K]*Difference_of_temperature
+2.602283822643699,Process temperature [K]*Difference_of_temperature
+2.5936312271053477,Torque [Nm]-Difference_of_temperature
+1.968681303482496,Rotational speed [rpm]*Difference_of_temperature
+1.8606573458176001,Air temperature [K]+Torque [Nm]
+1.8233906347664317,Air temperature [K]-Process temperature [K]
+1.777855098914068,Process temperature [K]+Rotational speed [rpm]
+1.4637215641322732,Rotational speed [rpm]-Tool wear [min]
+1.4523961116350153,Difference_of_temperature-Type_H
+1.4201843174491549,Torque [Nm]*Difference_of_temperature
+1.3641727199260858,Process temperature [K]*Rotational speed [rpm]
+1.340252316153124,Difference_of_temperature+Type_H
+1.3212915843394295,Tool wear [min]+Type_M
+1.3099313751581374,Rotational speed [rpm]+Difference_of_temperature
+1.2848149245715073,Air temperature [K]+Rotational speed [rpm]
+1.2756214889336772,Air temperature [K]-Tool wear [min]
+1.1968305065235219,Process temperature [K]*Torque [Nm]
+1.168551136730514,Difference_of_temperature-Type_M
+1.1216807896950454,Rotational speed [rpm]-Torque [Nm]
+1.1158609569131976,Torque [Nm]+Type_M
+1.084538970647896,Difference_of_temperature+Type_L
+1.0829748376754806,Process temperature [K]+Torque [Nm]
+1.023674345282254,Torque [Nm]*Type_M
+1.0094653793084676,Rotational speed [rpm]+Tool wear [min]
+1.0092454879491235,Rotational speed [rpm]+Type_H
+1.0077334557762194,Air temperature [K]-Torque [Nm]
+1.0061251506845919,Difference_of_temperature
+0.9884788720954975,Process temperature [K]-Torque [Nm]
+0.9653118373348417,Torque [Nm]-Type_L
+0.9245802710977572,Process temperature [K]*Tool wear [min]
+0.8862196125530686,Torque [Nm]-Tool wear [min]
+0.8818354874473325,Torque [Nm]+Difference_of_temperature
+0.8634758303254154,Tool wear [min]+Difference_of_temperature
+0.8107811296220248,Difference_of_temperature+Type_M
+0.7963693303631783,Tool wear [min]-Difference_of_temperature
+0.7631713235779438,Rotational speed [rpm]-Type_H
+0.7627465367351814,Air temperature [K]*Tool wear [min]
+0.744015038137787,Tool wear [min]-Type_H
+0.7153861887475169,Air temperature [K]-Difference_of_temperature
+0.7136856408468666,Torque [Nm]-Type_M
+0.6982843461827672,Air temperature [K]*Rotational speed [rpm]
+0.6918907048923273,Tool wear [min]-Type_M
+0.6717909804239618,Process temperature [K]-Tool wear [min]
+0.6652215378179266,Process temperature [K]-Rotational speed [rpm]
+0.6453856021478696,Process temperature [K]+Type_H
+0.6421337822378888,Rotational speed [rpm]
+0.6085047083411241,Tool wear [min]*Difference_of_temperature
+0.5971907238713597,Rotational speed [rpm]_log
+0.5920877770843649,Rotational speed [rpm]*Type_L
+0.5896967518518881,Rotational speed [rpm]+Torque [Nm]
+0.5805149337082898,Torque [Nm]+Type_H
+0.5571668383717016,Rotational speed [rpm]*Tool wear [min]
+0.5486349250844637,Process temperature [K]-Difference_of_temperature
+0.5300149299529058,Tool wear [min]
+0.47556952317423706,Air temperature [K]-Type_M
+0.47524433667298815,Air temperature [K]*Torque [Nm]
+0.4677004098187932,Process temperature [K]-Type_M
+0.45758818552136865,Air temperature [K]+Type_L
+0.4443472996118768,Torque [Nm]+Type_L
+0.44062648082612776,Torque [Nm]*Type_L
+0.43287347294294337,Tool wear [min]+Type_H
+0.401941777880845,Tool wear [min]-Type_L
+0.3966536262296758,Air temperature [K]-Rotational speed [rpm]
+0.3872091604298684,Torque [Nm]_log
+0.34269438983108713,Rotational speed [rpm]*Type_H
+0.32957810828190137,Torque [Nm]
+0.32664625302867895,Process temperature [K]+Difference_of_temperature
+0.3244461015824224,Rotational speed [rpm]-Difference_of_temperature
+0.31707297413478364,Rotational speed [rpm]+Type_L
+0.30919182353678876,Rotational speed [rpm]-Type_L
+0.30215192789313144,Difference_of_temperature-Type_L
+0.2930264182345066,Tool wear [min]*Type_M
+0.2922925714307506,Tool wear [min]*Type_L
+0.28011586184450443,Air temperature [K]-Type_L
+0.279792658959736,Air temperature [K]+Type_M
+0.26685501889290575,Process temperature [K]+Tool wear [min]
+0.2465203045140678,Tool wear [min]+Type_L
+0.24102776871574463,Process temperature [K]+Type_L
+0.23162605957654636,Difference_of_temperature*Type_L
+0.21863955704587795,Air temperature [K]+Process temperature [K]
+0.2172724462444395,Rotational speed [rpm]-Type_M
+0.20966638540742188,Air temperature [K]_log
+0.20505679963867574,Air temperature [K]+Tool wear [min]
+0.19450447250075203,Air temperature [K]-Type_H
+0.1863000892347277,Difference_of_temperature*Type_M
+0.17890544797537314,Process temperature [K]
+0.17154929201269542,Air temperature [K]*Process temperature [K]
+0.16799615701433138,Air temperature [K]
+0.1663290454325818,Process temperature [K]+Type_M
+0.1602507718478634,Air temperature [K]+Type_H
+0.15079958785341996,Process temperature [K]-Type_H
+0.1436016923936198,Rotational speed [rpm]+Type_M
+0.1371190498334788,Process temperature [K]*Type_M
+0.13537051330185462,Torque [Nm]-Type_H
+0.1327659337273756,Process temperature [K]-Type_L
+0.12218127741381732,Rotational speed [rpm]*Type_M
+0.11860053117286078,Torque [Nm]*Type_H
+0.11505137836749921,Air temperature [K]+Difference_of_temperature
+0.09898130897474294,Process temperature [K]_log
+0.07847127257761063,Tool wear [min]*Type_H
+0.07061063338824192,Air temperature [K]*Type_L
+0.06594846462891593,Difference_of_temperature*Type_H
+0.06085064618459078,Air temperature [K]*Type_M
+0.06053441567711758,Process temperature [K]*Type_L
+0.026742896589487374,Process temperature [K]*Type_H
+0.007500030227794814,Air temperature [K]*Type_H
+0.006875700144550167,Type_H+Type_L
+0.0035105922440906087,Type_H
 0.0,Type_L
-0.0,Type_H
+0.0,Type_H*Type_L
 0.0,Type_H*Type_M
+0.0,Type_H-Type_M
+0.0,Type_M
+0.0,Type_H-Type_L
+0.0,Type_L-Type_M
+0.0,Type_H+Type_M
+0.0,Type_L+Type_M
+0.0,Type_L*Type_M

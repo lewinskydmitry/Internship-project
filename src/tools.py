@@ -15,6 +15,7 @@ import torch.optim.lr_scheduler as lr
 import torch
 from torch.utils.data import DataLoader
 from src.DataLoader import TableDatasetPath, TableDatasetDF
+from sklearn.preprocessing import StandardScaler
 import wandb
 
 
@@ -80,7 +81,7 @@ def search_num_features(df, feature_importance, upsamp_func = False, step = 5):
                                                         random_state=42,
                                                         stratify = df['Machine failure'])
     if upsamp_func == True:
-      X_train, y_train = upsampling(X_train, y_train)
+      X_train, y_train = upsampling(1, X_train, y_train)
 
     train_pool = Pool(data=X_train, label=y_train)
     CatBoost = CatBoostClassifier(verbose=False)
@@ -150,8 +151,21 @@ def make_data(num_features, batch_size):
                                                     shuffle=True,
                                                     stratify=df['Machine failure'], random_state=42)
 
+    scaler = StandardScaler()
+
+    X_train = scaler.fit_transform(X_train)
+    X_test = scaler.fit_transform(X_test)
+    
+    X_train = pd.DataFrame(X_train).reset_index(drop = True)
+    X_test = pd.DataFrame(X_test).reset_index(drop = True)
+    y_train = y_train.reset_index(drop = True)
+    y_test = y_test.reset_index(drop = True)
+
     df_train = pd.concat([X_train, y_train], axis=1)
     df_test = pd.concat([X_test, y_test], axis = 1)
+
+    df_train.columns = features + ['Machine failure']
+    df_test.columns = features + ['Machine failure']
 
     train_dataset = TableDatasetDF(df_train)
     val_dataset = TableDatasetDF(df_test)
@@ -189,7 +203,7 @@ def create_nn_with_data(num_features,
         model.add_module(f'Dropout_{i+1}', nn.Dropout(0.1))
         model.add_module(f'Relu_{i+1}', nn.ReLU())
 
-    model.add_module(f'Linear_{num_layers}', nn.Linear(int(init_param/decay**(num_layers-2)), 2))
+    model.add_module(f'Linear_{num_layers-1}', nn.Linear(int(init_param/decay**(num_layers-2)), 2))
 
     return model, train_dl, val_dl
 
@@ -198,7 +212,7 @@ def make_experiments(model,
                      train_dl,
                      val_dl, batch_size, device = 'cuda'):
   
-  loss = Loss_class(FocalLoss(gamma=3))
+  loss = Loss_class(FocalLoss(gamma=2))
   model_factory = partial(Model_class)
   optimizer_factory = partial(torch.optim.AdamW)
   scheduler_factory = partial(lr.ExponentialLR)
@@ -208,7 +222,7 @@ def make_experiments(model,
   optimizer_params = dict(weight_decay=1e-3, lr=1e-2)
   scheduler_params = dict(gamma=0.95)
 
-  learning_params = dict(batch_size=batch_size, num_epoch=20)
+  learning_params = dict(batch_size=batch_size, num_epoch=40)
 
   wandb_init_params = dict(
       name=f'fe_{model[0].weight.shape[0]}_{batch_size}_{model[0].weight.shape[1]}',
