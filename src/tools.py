@@ -73,7 +73,7 @@ def search_num_features(df, feature_importance, upsamp_func = False, step = 5):
       X_train, y_train = upsampling(1, X_train, y_train)
 
     train_pool = Pool(data=X_train, label=y_train)
-    CatBoost = CatBoostClassifier(verbose=False)
+    CatBoost = CatBoostClassifier(verbose=False,random_seed=42)
     CatBoost.fit(train_pool)
     metrics_dict = check_result(CatBoost, X_test, y_test)
     print(f'F1_score - {metrics_dict["f1_score"]}, num_features - {best_num_features}, AUC_score = {metrics_dict["auc_score"]}')

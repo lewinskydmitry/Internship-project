@@ -8,6 +8,10 @@ from torch.utils.data import DataLoader
 import torch.nn as nn
 import torch.optim.lr_scheduler as lr
 import torch
+torch.manual_seed(42)
+generator = torch.Generator()
+generator.manual_seed(42)
+torch.backends.cudnn.deterministic = True
 
 from src.DataLoader import TableDatasetDF
 from src.Focal_loss import FocalLoss
@@ -24,6 +28,7 @@ class nn_creater:
     def __init__(self, path_to_data,
                  path_to_featureImportance,
                  num_features_list, init_param_list, num_layers_list, batch_sizes_list):
+        
         self.path_to_data = path_to_data
         self.path_to_featureImportance = path_to_featureImportance
         self.num_features_list = num_features_list
@@ -68,12 +73,14 @@ class nn_creater:
         train_dl = DataLoader(
             train_dataset, 
             batch_size=batch_size, 
-            shuffle=True)
+            shuffle=True,
+            generator=generator)
 
         val_dl = DataLoader(
             val_dataset,
             batch_size=batch_size, 
-            shuffle=True)
+            shuffle=True,
+            generator=generator)
             
         return train_dl, val_dl
 
