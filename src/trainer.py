@@ -101,7 +101,7 @@ class Trainer:
                 wandb.save(log_path, base_path = self.wandb_init_params['dir'])
 
                 self.run.log_artifact(model_artifact)
-            self.update_metrics(epoch=epoch, 
+            self.update_metrics(epoch=epoch,
                                 **train_to_update, 
                                 **val_to_update, 
                                 lr=self.scheduler.get_last_lr()[0]
