@@ -23,10 +23,10 @@ def upsampling(p=1., *data):
     minority_df = df[df['Machine failure'] == minority_class]
     upsampled_df = pd.concat(
         [df] + [minority_df.sample(n=int((class_counts[majority_class] - class_counts[minority_class])*p),
-                                  replace=True)], axis=0)
+                                  replace=True, random_state = 0)], axis=0)
 
     # Shuffle the upsampled data
-    upsampled_df = upsampled_df.sample(frac=1).reset_index(drop = True)
+    upsampled_df = upsampled_df.sample(frac=1, random_state = 0).reset_index(drop = True)
     return upsampled_df
   else:
     df = pd.concat([data[0], data[1]], axis=1)
@@ -41,10 +41,10 @@ def upsampling(p=1., *data):
     minority_df = df[df['Machine failure'] == minority_class]
     upsampled_df = pd.concat(
         [df] + [minority_df.sample(n=int((class_counts[majority_class] - class_counts[minority_class])*p),
-                                  replace=True)], axis=0)
+                                  replace=True, random_state = 0)], axis=0)
 
     # Shuffle the upsampled data
-    upsampled_df = upsampled_df.sample(frac=1).reset_index(drop = True)
+    upsampled_df = upsampled_df.sample(frac=1, random_state = 0).reset_index(drop = True)
     return upsampled_df.drop(columns = ['Machine failure']), upsampled_df['Machine failure']  
 
 
