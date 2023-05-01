@@ -13,7 +13,7 @@ generator = torch.Generator()
 generator.manual_seed(42)
 torch.backends.cudnn.deterministic = True
 
-from src.DataLoader import TableDatasetDF
+from DatasetClass import TableDatasetDF
 from src.Focal_loss import FocalLoss
 from src.Loss_class import Loss_class
 from src.Model_class import Model_class
