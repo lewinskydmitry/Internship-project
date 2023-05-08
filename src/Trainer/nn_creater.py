@@ -13,11 +13,11 @@ generator = torch.Generator()
 generator.manual_seed(42)
 torch.backends.cudnn.deterministic = True
 
-from DatasetClass import TableDatasetDF
-from src.Focal_loss import FocalLoss
-from src.Loss_class import Loss_class
-from src.Model_class import Model_class
-from src.trainer import Trainer
+from src.DatasetsClasses.DatasetClass import *
+from src.Losses.Focal_loss import FocalLoss
+from src.Losses.Loss_class import Loss_class
+from Models.Model_class import Model_class
+from src.Trainer.Trainer import Trainer
 
 from functools import partial
 
