@@ -26,7 +26,8 @@ class Trainer:
                  log=False,
                  wandb_init_params=None,
                  desc=None,
-                 model_dir=None):
+                 model_dir=None,
+                 saving_model = False):
         """
             Class for entire model training and validation process.
             It implements an initialization of the model, optimizer and scheduler.
@@ -64,6 +65,7 @@ class Trainer:
         # initializing metrics
         self.metrics = None
         self.init_metrics()
+        self.saving_model = saving_model
 
 
     @staticmethod
@@ -100,7 +102,7 @@ class Trainer:
                 name = self.wandb_init_params['name']
                 model_artifact = wandb.Artifact(name, type="model", description=f"{self.desc}")
                 
-                log_path = self.model_dir + name + ".pth"
+                log_path = self.model_dir + name + "_state_dict" + ".pth"
                 torch.save(self.model.state_dict(), log_path)
                 model_artifact.add_file(log_path)
                 wandb.save(log_path, base_path = self.wandb_init_params['dir'])
@@ -113,6 +115,8 @@ class Trainer:
                                )
             
             print("Epoch: {} of {}, {:.3f} min".format(epoch + 1, num_epoch, (time.time() - start_time) / 60))
+        if self.saving_model == True:
+            torch.save(self.model.model, self.model_dir + self.wandb_init_params['name'] + ".pth")
 
 
     def train_epoch(self, dataloader=None):
