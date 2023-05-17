@@ -1,4 +1,4 @@
-Air temperature [K],Process temperature [K],Rotational speed [rpm],Torque [Nm],Tool wear [min],Difference_of_temperature ,Type_H,Type_L,Type_M,Machine failure
+Air temperature [K],Process temperature [K],Rotational speed [rpm],Torque [Nm],Tool wear [min],Difference_of_temperature,Type_H,Type_L,Type_M,Machine failure
 298.1,308.6,1551,42.8,0,10.5,0,0,1,0
 298.2,308.7,1408,46.3,3,10.5,0,1,0,0
 298.1,308.5,1498,49.4,5,10.399999999999977,0,1,0,0
