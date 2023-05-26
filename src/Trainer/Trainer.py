@@ -57,8 +57,8 @@ class Trainer:
                 'name': 'empty_name'
             }
         self.run = None
-        if self.log:
-            self.run = self.log_hyperparams(self.wandb_init_params,
+        #if self.log:
+        self.run = self.log_hyperparams(self.wandb_init_params,
                                             **self.model_params, 
                                             **self.optimizer_params, 
                                             **self.scheduler_params)
@@ -85,8 +85,8 @@ class Trainer:
 
 
     def update_metrics(self, **to_update):
-        if self.log:
-            self.log_metrics(to_update)
+        #if self.log:
+        self.log_metrics(to_update)
         for name, value in to_update.items():
             self.metrics[name].append(value)
 
