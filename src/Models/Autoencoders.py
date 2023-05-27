@@ -57,7 +57,7 @@ class VAE(nn.Module):
 
     def decode(self, z):
         h3 = F.relu(self.fc3(z))
-        return torch.sigmoid(self.fc4(h3))
+        return self.fc4(h3)
 
     def forward(self, x):
         mean, logvar = self.encode(x)
@@ -74,10 +74,19 @@ class Encoder_loss:
         out = self.loss(y_pred, y_true)
         
         return out, {'loss': out.item()}
+    
+class vae_loss:  
+    def __init__(self, loss):
+        self.loss = loss
+          
+    def __call__(self, recon_x, mean, logvar, x):
+        out = self.loss(recon_x, mean, logvar, x)
+        
+        return out, {'loss': out.item()}
 
-def vae_loss_function(recon_x, x, mean, logvar):
+def vae_loss_function(recon_x, mean, logvar, x):
     # Reconstruction loss
-    reconstruction_loss = F.binary_cross_entropy(recon_x, x, reduction='sum')
+    reconstruction_loss = F.mse_loss(recon_x, x, reduction='sum')
 
     # KL divergence loss
     kl_divergence_loss = -0.5 * torch.sum(1 + logvar - mean.pow(2) - logvar.exp())
