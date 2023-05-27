@@ -85,8 +85,9 @@ class vae_loss:
         return out, {'loss': out.item()}
 
 def vae_loss_function(recon_x, mean, logvar, x):
-    # Reconstruction loss
-    reconstruction_loss = F.mse_loss(recon_x, x, reduction='sum')
+    # Reconstruction losss
+
+    reconstruction_loss = F.mse_loss(x,recon_x)
 
     # KL divergence loss
     kl_divergence_loss = -0.5 * torch.sum(1 + logvar - mean.pow(2) - logvar.exp())
