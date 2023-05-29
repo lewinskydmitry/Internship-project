@@ -23,3 +23,23 @@ class JoinedModel(nn.Module):
         x = self.encoder(x)
         x = self.classifier(x)
         return x
+
+
+class vae_classifier(nn.Module):
+    def __init__(self, vae_model, classifier):
+        super(vae_classifier, self).__init__()
+        self.vae = vae_model
+        self.classifier = classifier
+        
+        # Fix dimensionality of classifier input layer
+        classifier.layer1[0] = nn.Linear(self.vae.latent_size, classifier.layer1[0].out_features)
+        
+        # Freeze encoder
+        for param in vae_model.decoder.parameters():
+            param.requires_grad = False
+        
+    def forward(self, x):
+        mean, logvar = self.vae.encode(x)
+        x = self.vae.reparameterize(mean, logvar)
+        x = self.classifier(x)
+        return x

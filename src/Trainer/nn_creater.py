@@ -15,7 +15,7 @@ torch.backends.cudnn.deterministic = True
 
 from src.Models.Classifiers import *
 from Trainer.Loss_class import Loss_class
-from Models.Model_class import Model_class
+from Trainer.Model_class import Model_class
 from src.Trainer.Trainer import Trainer
 
 from functools import partial

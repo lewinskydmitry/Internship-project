@@ -28,6 +28,44 @@ class Autoencoder(nn.Module):
         x = self.decoder(x)
         return x
 
+# class VAE(nn.Module):
+#     def __init__(self, input_size, hidden_size, latent_size):
+#         super(VAE, self).__init__()
+#         self.input_size = input_size
+#         self.hidden_size = hidden_size
+#         self.latent_size = latent_size
+
+#         # Encoder layers
+#         self.fc1 = nn.Linear(input_size, hidden_size)
+#         self.fc_mean = nn.Linear(hidden_size, latent_size)
+#         self.fc_logvar = nn.Linear(hidden_size, latent_size)
+
+#         # Decoder layers
+#         self.fc3 = nn.Linear(latent_size, hidden_size)
+#         self.fc4 = nn.Linear(hidden_size, input_size)
+
+#     def encode(self, x):
+#         h1 = F.relu(self.fc1(x))
+#         mean = self.fc_mean(h1)
+#         logvar = self.fc_logvar(h1)
+#         return mean, logvar
+
+#     def reparameterize(self, mean, logvar):
+#         std = torch.exp(0.5 * logvar)
+#         eps = torch.randn_like(std)
+#         return mean + eps * std
+
+#     def decode(self, z):
+#         h3 = F.relu(self.fc3(z))
+#         return self.fc4(h3)
+
+#     def forward(self, x):
+#         mean, logvar = self.encode(x)
+#         z = self.reparameterize(mean, logvar)
+#         recon_x = self.decode(z)
+#         return recon_x, mean, logvar
+
+
 class VAE(nn.Module):
     def __init__(self, input_size, hidden_size, latent_size):
         super(VAE, self).__init__()
@@ -36,35 +74,39 @@ class VAE(nn.Module):
         self.latent_size = latent_size
 
         # Encoder layers
-        self.fc1 = nn.Linear(input_size, hidden_size)
-        self.fc_mean = nn.Linear(hidden_size, latent_size)
-        self.fc_logvar = nn.Linear(hidden_size, latent_size)
+        self.encoder = nn.Sequential(
+            nn.Linear(input_size, hidden_size),
+            nn.ReLU(),
+            nn.Linear(hidden_size, latent_size * 2)  # Output size is doubled to account for mean and logvar
+        )
 
         # Decoder layers
-        self.fc3 = nn.Linear(latent_size, hidden_size)
-        self.fc4 = nn.Linear(hidden_size, input_size)
+        self.decoder = nn.Sequential(
+            nn.Linear(latent_size, hidden_size),
+            nn.ReLU(),
+            nn.Linear(hidden_size, input_size),
+        )
 
     def encode(self, x):
-        h1 = F.relu(self.fc1(x))
-        mean = self.fc_mean(h1)
-        logvar = self.fc_logvar(h1)
+        encoded = self.encoder(x)
+        mean, logvar = torch.split(encoded, self.latent_size, dim=1)  # Split the encoded tensor into mean and logvar
         return mean, logvar
+
+    def decode(self, z):
+        decoded = self.decoder(z)
+        return decoded
 
     def reparameterize(self, mean, logvar):
         std = torch.exp(0.5 * logvar)
         eps = torch.randn_like(std)
         return mean + eps * std
 
-    def decode(self, z):
-        h3 = F.relu(self.fc3(z))
-        return self.fc4(h3)
-
     def forward(self, x):
         mean, logvar = self.encode(x)
         z = self.reparameterize(mean, logvar)
         recon_x = self.decode(z)
         return recon_x, mean, logvar
-    
+
 ### LOSS FUNCTION ###
 class Encoder_loss:
     def __init__(self, loss):
