@@ -135,7 +135,7 @@ def vae_loss_function(recon_x, mean, logvar, x):
     kl_divergence_loss = -0.5 * torch.sum(1 + logvar - mean.pow(2) - logvar.exp())
 
     # Total loss
-    total_loss = reconstruction_loss + kl_divergence_loss
+    total_loss = reconstruction_loss + kl_divergence_loss 10e-4
 
     return total_loss
 

@@ -39,7 +39,7 @@ class vae_classifier(nn.Module):
             param.requires_grad = False
         
     def forward(self, x):
-        mean, logvar = self.vae.encode(x)
+        mean, logvar = self.vae.encode(x) #use only mean!!!
         x = self.vae.reparameterize(mean, logvar)
         x = self.classifier(x)
         return x
