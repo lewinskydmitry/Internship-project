@@ -20,11 +20,10 @@ class Autoencoder(nn.Module):
 class VAE(nn.Module):
     def __init__(self,encoder, decoder):
         super(VAE, self).__init__()
-
         # Encoder layers
         self.encoder = encoder
         self.latent_size = encoder[-1].out_features
-        self.encoder[-1] = nn.Linear(encoder[-1].in_features,encoder[-1].out_features*2)
+        self.encoder[-1] = nn.Linear(encoder[-1].in_features, encoder[-1].out_features*2)
         # Decoder layers
         self.decoder = decoder
 

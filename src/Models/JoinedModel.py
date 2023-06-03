@@ -35,7 +35,7 @@ class JoinedModel_VAE(nn.Module):
         classifier.layer1[0] = nn.Linear(self.vae.latent_size, classifier.layer1[0].out_features)
         
         # Freeze encoder
-        for param in vae_model.decoder.parameters():
+        for param in self.vae.encoder.parameters():
             param.requires_grad = False
         
     def forward(self, x):
