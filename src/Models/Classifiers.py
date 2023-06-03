@@ -12,42 +12,36 @@ class Baseline_classifier(nn.Module):
         self.layer1 = nn.Sequential(
             nn.Linear(num_features, init_param),
             nn.BatchNorm1d(init_param),
-            # nn.Dropout(0.1),
             nn.ReLU()
         )
 
         self.layer2 = nn.Sequential(
             nn.Linear(init_param, init_param),
             nn.BatchNorm1d(init_param),
-            # nn.Dropout(0.1),
             nn.ReLU()
         )
 
         self.layer3 = nn.Sequential(
             nn.Linear(init_param, init_param),
             nn.BatchNorm1d(init_param),
-            # nn.Dropout(0.1),
             nn.ReLU()
         )
 
         self.layer4 = nn.Sequential(
             nn.Linear(init_param, int(init_param/2)),
             nn.BatchNorm1d(int(init_param/2)),
-            # nn.Dropout(0.1),
             nn.ReLU()
         )
 
         self.layer5 = nn.Sequential(
             nn.Linear(int(init_param/2), int(init_param/4)),
             nn.BatchNorm1d(int(init_param/4)),
-            # nn.Dropout(0.1),
             nn.ReLU()
         )
 
         self.layer6 = nn.Sequential(
             nn.Linear(int(init_param/4), int(init_param/8)),
             nn.BatchNorm1d(int(init_param/8)),
-            # nn.Dropout(0.1),
             nn.ReLU()
         )
 

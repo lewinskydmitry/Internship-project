@@ -12,7 +12,7 @@ from tqdm import tqdm
 from collections import defaultdict
 
 
-class VAE_Trainer:
+class Trainer_VAE:
     def __init__(self,
                  train_dataloader,
                  test_dataloader,
