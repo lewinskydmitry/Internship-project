@@ -25,9 +25,9 @@ class JoinedModel(nn.Module):
         return x
 
 
-class vae_classifier(nn.Module):
+class JoinedModel_VAE(nn.Module):
     def __init__(self, vae_model, classifier):
-        super(vae_classifier, self).__init__()
+        super(JoinedModel_VAE, self).__init__()
         self.vae = vae_model
         self.classifier = classifier
         
@@ -39,7 +39,6 @@ class vae_classifier(nn.Module):
             param.requires_grad = False
         
     def forward(self, x):
-        mean, logvar = self.vae.encode(x) #use only mean!!!
-        x = self.vae.reparameterize(mean, logvar)
-        x = self.classifier(x)
+        mean, logvar = self.vae.encode(x)
+        x = self.classifier(mean)
         return x
