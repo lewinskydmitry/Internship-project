@@ -6,22 +6,10 @@ from torch.utils.data import Dataset
 
 ### MODELS ###
 class Autoencoder(nn.Module):
-    def __init__(self, input_size, hidden_size, latent_representation):
+    def __init__(self,encoder, decoder):
         super(Autoencoder, self).__init__()
-        self.encoder = nn.Sequential(
-            nn.Linear(input_size, int(hidden_size)),
-            nn.ReLU(),
-            nn.Linear(int(hidden_size), int(hidden_size/2)),
-            nn.ReLU(),
-            nn.Linear(int(hidden_size/2), latent_representation)
-        )
-        self.decoder = nn.Sequential(
-            nn.Linear(latent_representation, int(hidden_size/2)),
-            nn.ReLU(),
-            nn.Linear(int(hidden_size/2), int(hidden_size)),
-            nn.ReLU(),
-            nn.Linear(int(hidden_size), input_size)
-        )
+        self.encoder = encoder
+        self.decoder = decoder
         
     def forward(self, x):
         x = self.encoder(x)
@@ -30,25 +18,15 @@ class Autoencoder(nn.Module):
 
 
 class VAE(nn.Module):
-    def __init__(self, input_size, hidden_size, latent_size):
+    def __init__(self,encoder, decoder):
         super(VAE, self).__init__()
-        self.input_size = input_size
-        self.hidden_size = hidden_size
-        self.latent_size = latent_size
 
         # Encoder layers
-        self.encoder = nn.Sequential(
-            nn.Linear(input_size, hidden_size),
-            nn.ReLU(),
-            nn.Linear(hidden_size, latent_size * 2)  # Output size is doubled to account for mean and logvar
-        )
-
+        self.encoder = encoder
+        self.latent_size = encoder[-1].out_features
+        self.encoder[-1] = nn.Linear(encoder[-1].in_features,encoder[-1].out_features*2)
         # Decoder layers
-        self.decoder = nn.Sequential(
-            nn.Linear(latent_size, hidden_size),
-            nn.ReLU(),
-            nn.Linear(hidden_size, input_size),
-        )
+        self.decoder = decoder
 
     def encode(self, x):
         encoded = self.encoder(x)

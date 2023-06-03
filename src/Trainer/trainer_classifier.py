@@ -12,7 +12,7 @@ from tqdm import tqdm
 from collections import defaultdict
 
 
-class Trainer:
+class Trainer_classifier:
     def __init__(self,
                  train_dataloader,
                  test_dataloader,
