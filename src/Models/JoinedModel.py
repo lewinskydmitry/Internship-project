@@ -8,37 +8,24 @@ class JoinedModel(nn.Module):
 
         # Get list of encoder layers
         if isinstance(encoder, nn.Sequential):
-            encoder_layers = list(encoder.children())
+            # Fix dimensionality of classifier input layer
+            classifier.layer1[0] = nn.Linear(self.encoder[-1].out_features, classifier.layer1[0].out_features)
+            # Freeze encoder
+            for param in encoder.parameters():
+                param.requires_grad = False
         else:
-            encoder_layers = [encoder]
-        
-        # Fix dimensionality of classifier input layer
-        classifier.layer1[0] = nn.Linear(encoder_layers[-1].out_features, classifier.layer1[0].out_features)
-        
-        # Freeze encoder
-        for param in encoder.parameters():
-            param.requires_grad = False
+            # Fix dimensionality of classifier input layer
+            classifier.layer1[0] = nn.Linear(self.encoder.latent_size, classifier.layer1[0].out_features)
+            
+            # Freeze encoder
+            for param in self.encoder.encoder.parameters():
+                param.requires_grad = False
         
     def forward(self, x):
-        x = self.encoder(x)
-        x = self.classifier(x)
-        return x
-
-
-class JoinedModel_VAE(nn.Module):
-    def __init__(self, vae_model, classifier):
-        super(JoinedModel_VAE, self).__init__()
-        self.vae = vae_model
-        self.classifier = classifier
-        
-        # Fix dimensionality of classifier input layer
-        classifier.layer1[0] = nn.Linear(self.vae.latent_size, classifier.layer1[0].out_features)
-        
-        # Freeze encoder
-        for param in self.vae.encoder.parameters():
-            param.requires_grad = False
-        
-    def forward(self, x):
-        mean, logvar = self.vae.encode(x)
-        x = self.classifier(mean)
+        if isinstance(self.encoder, nn.Sequential):
+            x = self.encoder(x)
+            x = self.classifier(x)
+        else:
+            mean, logvar = self.encoder.encode(x)
+            x = self.classifier(mean)
         return x
