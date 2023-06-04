@@ -2,11 +2,13 @@ import torch
 import torch.nn as nn
 from sklearn.cluster import KMeans
 
-class twoHeadedModel(nn.Module):
+class TwoHeadedModel(nn.Module):
     def __init__(self, encoder, classifier):
-        super(twoHeadedModel, self).__init__()
+        super(TwoHeadedModel, self).__init__()
         self.encoder = encoder
         self.classifier = classifier
+        self.classifier.layer1[0] = nn.Linear(self.encoder[-1].out_features, classifier.layer1[0].out_features)
+
         
     def forward(self, x):
         x = self.encoder(x)
@@ -40,4 +42,3 @@ class TwoHeadedLoss(nn.Module):
         total_loss = cluster_loss + classification_loss
         
         return total_loss
-
