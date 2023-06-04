@@ -3,15 +3,15 @@ import torch.nn as nn
 from sklearn.cluster import KMeans
 
 class TwoHeadedModel(nn.Module):
-    def __init__(self, encoder, classifier):
+    def __init__(self, features_extractor, classifier):
         super(TwoHeadedModel, self).__init__()
-        self.encoder = encoder
+        self.features_extractor = features_extractor
         self.classifier = classifier
-        self.classifier.layer1[0] = nn.Linear(self.encoder[-1].out_features, classifier.layer1[0].out_features)
+        self.classifier[0] = nn.Linear(self.features_extractor[-1].out_features, self.classifier[0].out_features)
 
         
     def forward(self, x):
-        x = self.encoder(x)
+        x = self.features_extractor(x)
         x = self.classifier(x)
         return x
 
@@ -23,7 +23,7 @@ class TwoHeadedLoss(nn.Module):
         self.classification_loss_fn = classification_loss_fn
         self.kmeans = KMeans(n_clusters=num_clusters)
 
-    def forward(self, features, labels, classification_logits):
+    def forward(self, features, classification_logits, labels):
         # Update cluster centers using k-means
         self.kmeans.fit(features.detach().cpu().numpy())
         cluster_centers = torch.from_numpy(self.kmeans.cluster_centers_).to(features.device)
