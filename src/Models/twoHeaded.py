@@ -32,7 +32,7 @@ class TwoHeadedLoss(nn.Module):
         distances = torch.cdist(features, cluster_centers)
         softmax_weights = nn.functional.softmax(-distances, dim=1)
         cluster_loss = torch.mean(
-            softmax_weights[:, 0] * distances[:, 0] + (1 - softmax_weights[:, 1]) * distances[:, 1]
+            softmax_weights[:, 0] * distances[:, 0] + (1 - softmax_weights[:, 0]) * distances[:, 1]
         )
         
         # Compute classification loss
