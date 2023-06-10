@@ -4,12 +4,24 @@ import torch.nn.functional as F
 import numpy as np
 from torch.utils.data import Dataset
 
+def create_mirror_layers(layers):
+    mirror_modules = []
+    for module in reversed(layers):
+        if isinstance(module, nn.Linear):
+            mirror_modules.append(nn.Linear(module.out_features, module.in_features))
+        else:
+            mirror_modules.append(module)
+    return nn.Sequential(*mirror_modules)
+
 ### MODELS ###
 class Autoencoder(nn.Module):
-    def __init__(self,encoder, decoder):
+    def __init__(self, encoder, latent_space = None):
         super(Autoencoder, self).__init__()
         self.encoder = encoder
-        self.decoder = decoder
+        if latent_space != None:
+            self.encoder[-1] = nn.Linear(encoder[-1].in_features, latent_space)
+        self.decoder = create_mirror_layers(self.encoder)
+        
         
     def forward(self, x):
         x = self.encoder(x)
@@ -18,14 +30,14 @@ class Autoencoder(nn.Module):
 
 
 class VAE(nn.Module):
-    def __init__(self,encoder, decoder):
+    def __init__(self,encoder, latent_space):
         super(VAE, self).__init__()
         # Encoder layers
         self.encoder = encoder
-        self.latent_size = encoder[-1].out_features
         self.encoder[-1] = nn.Linear(encoder[-1].in_features, encoder[-1].out_features*2)
-        # Decoder layers
-        self.decoder = decoder
+        if latent_space != None:
+            self.encoder[-1] = nn.Linear(encoder[-1].in_features, latent_space)
+        self.decoder = create_mirror_layers(self.encoder)
 
     def encode(self, x):
         encoded = self.encoder(x)
