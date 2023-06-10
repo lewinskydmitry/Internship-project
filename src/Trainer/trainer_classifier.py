@@ -98,16 +98,16 @@ class Trainer_classifier:
 
             train_to_update = self.train_epoch()
             val_to_update = self.validate_epoch(self.test_dataloader, log_folder='test')
-            if self.log:
-                name = self.wandb_init_params['name']
-                model_artifact = wandb.Artifact(name, type="model", description=f"{self.desc}")
+            # if self.log:
+            #     name = self.wandb_init_params['name']
+            #     model_artifact = wandb.Artifact(name, type="model", description=f"{self.desc}")
                 
-                log_path = self.model_dir + name + "_state_dict" + ".pth"
-                torch.save(self.model.state_dict(), log_path)
-                model_artifact.add_file(log_path)
-                wandb.save(log_path, base_path = self.wandb_init_params['dir'])
+            #     log_path = self.model_dir + name + "_state_dict" + ".pth"
+            #     torch.save(self.model.state_dict(), log_path)
+            #     model_artifact.add_file(log_path)
+            #     wandb.save(log_path, base_path = self.wandb_init_params['dir'])
 
-                self.run.log_artifact(model_artifact)
+            #     self.run.log_artifact(model_artifact)
             self.update_metrics(epoch=epoch,
                                 **train_to_update, 
                                 **val_to_update, 

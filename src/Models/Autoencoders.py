@@ -31,20 +31,20 @@ class Autoencoder(nn.Module):
 
 
 class VAE(nn.Module):
-    def __init__(self,encoder, latent_space):
+    def __init__(self,encoder, latent_size):
         super(VAE, self).__init__()
         # Encoder layers
         self.encoder = copy.deepcopy(encoder)
-        self.latent_space = latent_space
+        self.latent_size = latent_size
         self.encoder[-1] = nn.Linear(self.encoder[-1].in_features, self.encoder[-1].out_features*2)
-        if self.latent_space != None:
-            self.encoder[-1] = nn.Linear(self.encoder[-1].in_features, self.latent_space*2)
+        if self.latent_size != None:
+            self.encoder[-1] = nn.Linear(self.encoder[-1].in_features, self.latent_size*2)
         self.decoder = create_mirror_layers(encoder)
-        self.decoder[0] = nn.Linear(self.latent_space, self.decoder[0].out_features)
+        self.decoder[0] = nn.Linear(self.latent_size, self.decoder[0].out_features)
 
     def encode(self, x):
         encoded = self.encoder(x)
-        mean, logvar = torch.split(encoded, self.latent_space, dim=1)  # Split the encoded tensor into mean and logvar
+        mean, logvar = torch.split(encoded, self.latent_size, dim=1)  # Split the encoded tensor into mean and logvar
         return mean, logvar
 
     def decode(self, z):
