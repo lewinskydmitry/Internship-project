@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
 from torch.utils.data import Dataset
+import copy
 
 def create_mirror_layers(layers):
     mirror_modules = []
@@ -17,9 +18,9 @@ def create_mirror_layers(layers):
 class Autoencoder(nn.Module):
     def __init__(self, encoder, latent_space = None):
         super(Autoencoder, self).__init__()
-        self.encoder = encoder
+        self.encoder = copy.deepcopy(encoder)
         if latent_space != None:
-            self.encoder[-1] = nn.Linear(encoder[-1].in_features, latent_space)
+            self.encoder[-1] = nn.Linear(self.encoder[-1].in_features, latent_space)
         self.decoder = create_mirror_layers(self.encoder)
         
         
@@ -33,15 +34,17 @@ class VAE(nn.Module):
     def __init__(self,encoder, latent_space):
         super(VAE, self).__init__()
         # Encoder layers
-        self.encoder = encoder
-        self.encoder[-1] = nn.Linear(encoder[-1].in_features, encoder[-1].out_features*2)
-        if latent_space != None:
-            self.encoder[-1] = nn.Linear(encoder[-1].in_features, latent_space)
-        self.decoder = create_mirror_layers(self.encoder)
+        self.encoder = copy.deepcopy(encoder)
+        self.latent_space = latent_space
+        self.encoder[-1] = nn.Linear(self.encoder[-1].in_features, self.encoder[-1].out_features*2)
+        if self.latent_space != None:
+            self.encoder[-1] = nn.Linear(self.encoder[-1].in_features, self.latent_space*2)
+        self.decoder = create_mirror_layers(encoder)
+        self.decoder[0] = nn.Linear(self.latent_space, self.decoder[0].out_features)
 
     def encode(self, x):
         encoded = self.encoder(x)
-        mean, logvar = torch.split(encoded, self.latent_size, dim=1)  # Split the encoded tensor into mean and logvar
+        mean, logvar = torch.split(encoded, self.latent_space, dim=1)  # Split the encoded tensor into mean and logvar
         return mean, logvar
 
     def decode(self, z):
