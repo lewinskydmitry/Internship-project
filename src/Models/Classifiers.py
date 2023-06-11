@@ -48,20 +48,13 @@ class Baseline_classifier(nn.Module):
         return x
     
 class Simple_classifier(nn.Module):
-    def __init__(self, num_features, init_param):
+    def __init__(self, num_features):
         super(Simple_classifier, self).__init__()
 
-        self.layer1 = nn.Sequential(
-            nn.Linear(num_features, init_param),
-            nn.BatchNorm1d(init_param),
-            nn.ReLU()
-        )
-
-        self.layer2 = nn.Linear(init_param, 2)
+        self.layer1 = nn.Linear(num_features, 2)
 
     def forward(self, x):
         x = self.layer1(x)
-        x = self.layer2(x)
         return x
 
 ### LOSS FUNCTION ###
