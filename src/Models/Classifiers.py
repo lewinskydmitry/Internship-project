@@ -37,10 +37,10 @@ class Baseline_classifier(nn.Module):
             nn.Linear(int(init_param/32), int(init_param/64)),
             nn.BatchNorm1d(int(init_param/64)),
             nn.ReLU(),
-            nn.Linear(int(init_param/64), int(init_param/128)),
-            nn.BatchNorm1d(int(init_param/128)),
+            nn.Linear(int(init_param/64), int(init_param/64)),
+            nn.BatchNorm1d(int(init_param/64)),
             nn.ReLU(),
-            nn.Linear(int(init_param/128), 2)
+            nn.Linear(int(init_param/64), 2)
 )
 
     def forward(self, x):
