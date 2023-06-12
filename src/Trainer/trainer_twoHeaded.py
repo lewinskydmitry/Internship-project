@@ -134,10 +134,11 @@ class Trainer_twoHeaded:
             X_batch = X_batch.to(device)
             y_batch = y_batch.to(device)
 
-            features = model.model.features_extractor(X_batch)
+            features = model.model.encoder(X_batch)
+            x_restored = model.model.decoder(features) 
             logits = model.model.classifier(features)
 
-            loss, cur_metrics = self.loss(features, logits, y_batch)
+            loss, cur_metrics = self.loss(features, logits, y_batch, X_batch,x_restored)
             loss.backward()
             opt.step()
 
@@ -161,10 +162,11 @@ class Trainer_twoHeaded:
                 X_batch = X_batch.to(device)
                 y_batch = y_batch.to(device)
                 
-                features = model.model.features_extractor(X_batch)
+                features = model.model.encoder(X_batch)
+                x_restored = model.model.decoder(features)
                 logits = model.model.classifier(features)
 
-                loss, cur_metrics = self.loss(features,logits, y_batch)
+                loss, cur_metrics = self.loss(features, logits, y_batch, X_batch, x_restored)
 
                 for name, value in cur_metrics.items():
                     metrics[name].append(value)
