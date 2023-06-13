@@ -38,9 +38,10 @@ class VAE(nn.Module):
         self.latent_size = latent_size
         self.encoder[-1] = nn.Linear(self.encoder[-1].in_features, self.encoder[-1].out_features*2)
         if self.latent_size != None:
-            self.encoder[-1] = nn.Linear(self.encoder[-1].in_features, self.latent_size*2)
-        self.decoder = create_mirror_layers(encoder)
-        self.decoder[0] = nn.Linear(self.latent_size, self.decoder[0].out_features)
+            self.encoder[-1] = nn.Linear(self.encoder[-1].in_features, self.latent_size*2) 
+        self.decoder = create_mirror_layers(self.encoder)
+        self.decoder[0] = nn.Linear(self.latent_size, self.encoder[-1].in_features)
+
 
     def encode(self, x):
         encoded = self.encoder(x)

@@ -114,7 +114,7 @@ class Trainer_VAE:
                                 lr=self.scheduler.get_last_lr()[0]
                                )
             
-            print("Epoch: {} of {}, {:.3f} min".format(epoch + 1, num_epoch, (time.time() - start_time) / 60))
+            # print("Epoch: {} of {}, {:.3f} min".format(epoch + 1, num_epoch, (time.time() - start_time) / 60))
         if self.saving_model == True:
             torch.save(self.model.model, self.model_dir + self.wandb_init_params['name'] + ".pth")
 
@@ -128,7 +128,8 @@ class Trainer_VAE:
         
         metrics = defaultdict(list)
         model.train(True)
-        for X_batch, y_batch in tqdm(dataloader, desc='I\'m studying hard now🧐, don\'t disturb!'):
+        # for X_batch, y_batch in tqdm(dataloader, desc='I\'m studying hard now🧐, don\'t disturb!'):
+        for X_batch, y_batch in dataloader:
             opt.zero_grad()
 
             X_batch = X_batch.to(device)
@@ -155,7 +156,8 @@ class Trainer_VAE:
  
         model.eval()
         with torch.no_grad():
-            for X_batch, y_batch in tqdm(dataloader, desc='Let\'s see how good I am...'):
+            # for X_batch, y_batch in tqdm(dataloader, desc='Let\'s see how good I am...'):
+            for X_batch, y_batch in dataloader:
                 X_batch = X_batch.to(device)
                 y_batch = y_batch.to(device)
                 
