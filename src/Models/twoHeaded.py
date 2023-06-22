@@ -42,8 +42,8 @@ class TwoHeadedLoss(nn.Module):
         # Compute classification loss
         classification_loss = self.classification_loss_fn(classification_logits, labels)
         decoder_loss = self.decoder_loss(x_init, x_restored)
-        
+
         # Combine the two losses
-        total_loss = cluster_loss*0.05 + classification_loss + decoder_loss*0.05
-        
+        total_loss = cluster_loss*1e-3 + classification_loss + decoder_loss*1e-5
+
         return total_loss
