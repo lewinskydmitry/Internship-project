@@ -1,4 +1,4 @@
-import pandas as pd
+import copy
 import numpy as np
 from sklearn.neighbors import NearestNeighbors
 
@@ -11,7 +11,6 @@ class data_level():
 
     def prepare_data(self, *data):
         if len(data) == 1:
-            # Count the number of samples in each class
             df = data[0]
             X = df[:,:-1]
             y = df[:,-1]
@@ -19,7 +18,7 @@ class data_level():
             X = data[0]
             y = data[1]
 
-        return np.array(X), np.array(y)
+        return np.array(X).copy(), np.array(y).copy()
     
     def ROS(self, p=1.):
         X, y = self.prepare_data(self.X, self.y)
@@ -35,8 +34,11 @@ class data_level():
 
         X_oversampled = np.concatenate((X, X[oversampled_indices]), axis=0)
         y_oversampled = np.concatenate((y, y[oversampled_indices]), axis=0)
+        ROS_data = np.concatenate((X_oversampled, y_oversampled), axis = 1)
+        np.random.shuffle(ROS_data)
+        self.ROS_data = ROS_data
 
-        return X_oversampled, y_oversampled
+        return ROS_data
     
 
     def RUS(self, p=0.5):
@@ -54,13 +56,16 @@ class data_level():
         X_undersampled = np.concatenate((X[~undersampled_indices], X[y == minority_class]), axis=0)
         y_undersampled = np.concatenate((y[~undersampled_indices], y[y == minority_class]), axis=0)
 
-        return X_undersampled, y_undersampled
+        RUS_data = np.concatenate((X_undersampled, y_undersampled), axis = 1)
+        np.random.shuffle(RUS_data)
+        self.RUS_data = RUS_data
+
+        return RUS_data
 
 
-    def SMOTE(self, p=1., k=4, *data):
+    def SMOTE(self, p=1., k=4):
         # Convert input to numpy arrays if needed
-        X = np.array(X)
-        y = np.array(y)
+        X, y = self.prepare_data(self.X, self.y)
 
         # Count the number of samples in each class
         class_counts = np.bincount(y)
@@ -68,10 +73,10 @@ class data_level():
         majority_class = np.argmax(class_counts)
 
         # Calculate the desired number of synthetic samples
-        target_count = int(class_counts[majority_class] * p) - class_counts[minority_class]
+        sampling_amount = int(class_counts[majority_class] * p) - class_counts[minority_class]
 
         # Initialize arrays to store synthetic samples
-        synthetic_samples = np.zeros((target_count, X.shape[1]))
+        synthetic_samples = np.zeros((sampling_amount, X.shape[1]))
 
         # Find k nearest neighbors for each minority class sample
         nn = NearestNeighbors(n_neighbors=k+1)
@@ -79,7 +84,7 @@ class data_level():
         indices = nn.kneighbors(return_distance=False)
 
         # Generate synthetic samples
-        for i in range(target_count):
+        for i in range(sampling_amount):
             # Randomly choose a minority class sample
             idx = np.random.choice(len(indices))
             sample = X[y == minority_class][idx]
@@ -95,7 +100,7 @@ class data_level():
 
         # Combine original and synthetic samples
         X_resampled = np.vstack((X, synthetic_samples))
-        y_resampled = np.concatenate((y, [minority_class] * target_count))
+        y_resampled = np.concatenate((y, [minority_class] * sampling_amount))
 
         return X_resampled, y_resampled
 
