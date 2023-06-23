@@ -1,24 +1,21 @@
 import copy
 import numpy as np
-from sklearn.neighbors import NearestNeighbors
+from imblearn.over_sampling import SMOTE
+from imblearn.under_sampling import OneSidedSelection
 
 class data_level():
-    def __init__(self, X, y) -> None:
+    def __init__(self, X, y, p, random_seed) -> None:
         self.X = X
         self.y = y
-        self.ROS_data = None
-        self.RUS_data = None
+        self.data = {}
+        self.p = p
+        self.randoom_seed = random_seed
+        np.random.seed(random_seed)
 
-    def prepare_data(self, *data):
-        if len(data) == 1:
-            df = data[0]
-            X = df[:,:-1]
-            y = df[:,-1]
-        else:
-            X = data[0]
-            y = data[1]
 
+    def prepare_data(self, X, y):
         return np.array(X).copy(), np.array(y).copy()
+    
     
     def ROS(self, p=1.):
         X, y = self.prepare_data(self.X, self.y)
@@ -36,7 +33,7 @@ class data_level():
         y_oversampled = np.concatenate((y, y[oversampled_indices]), axis=0)
         ROS_data = np.concatenate((X_oversampled, y_oversampled), axis = 1)
         np.random.shuffle(ROS_data)
-        self.ROS_data = ROS_data
+        self.data['ROS_data'] = ROS_data
 
         return ROS_data
     
@@ -58,50 +55,29 @@ class data_level():
 
         RUS_data = np.concatenate((X_undersampled, y_undersampled), axis = 1)
         np.random.shuffle(RUS_data)
-        self.RUS_data = RUS_data
+        self.data['RUS_data'] = RUS_data
 
         return RUS_data
 
 
-    def SMOTE(self, p=1., k=4):
-        # Convert input to numpy arrays if needed
+    def SMOTE(self, p = 1.):
         X, y = self.prepare_data(self.X, self.y)
+        sm = SMOTE(random_state=42, sampling_strategy = p) # type: ignore
+        X_res, y_res = sm.fit_resample(X, y) # type: ignore
+        y_res = np.array(y_res).reshape(-1,1)
+        SMOTE_data = np.concatenate((X_res, y_res), axis = 1)
+        np.random.shuffle(SMOTE_data)
+        self.data['SMOTE_data'] = SMOTE_data
 
-        # Count the number of samples in each class
-        class_counts = np.bincount(y)
-        minority_class = np.argmin(class_counts)
-        majority_class = np.argmax(class_counts)
+        return SMOTE_data
 
-        # Calculate the desired number of synthetic samples
-        sampling_amount = int(class_counts[majority_class] * p) - class_counts[minority_class]
+    def OSS(self):
+        X, y = self.prepare_data(self.X, self.y)
+        oss = OneSidedSelection(random_state=42)
+        X_res, y_res = oss.fit_resample(X, y) # type: ignore
+        y_res = np.array(y_res).reshape(-1,1)
+        OSS_data = np.concatenate((X_res, y_res), axis = 1)
+        np.random.shuffle(OSS_data)
+        self.data['OSS_data'] = OSS_data
 
-        # Initialize arrays to store synthetic samples
-        synthetic_samples = np.zeros((sampling_amount, X.shape[1]))
-
-        # Find k nearest neighbors for each minority class sample
-        nn = NearestNeighbors(n_neighbors=k+1)
-        nn.fit(X[y == minority_class])
-        indices = nn.kneighbors(return_distance=False)
-
-        # Generate synthetic samples
-        for i in range(sampling_amount):
-            # Randomly choose a minority class sample
-            idx = np.random.choice(len(indices))
-            sample = X[y == minority_class][idx]
-
-            # Randomly choose one of its k nearest neighbors
-            nn_idx = np.random.choice(indices[idx])
-
-            # Calculate the difference between the sample and its neighbor
-            diff = X[nn_idx] - sample
-
-            # Generate a synthetic sample
-            synthetic_samples[i] = sample + np.random.random() * diff
-
-        # Combine original and synthetic samples
-        X_resampled = np.vstack((X, synthetic_samples))
-        y_resampled = np.concatenate((y, [minority_class] * sampling_amount))
-
-        return X_resampled, y_resampled
-
-
+        return OSS_data
