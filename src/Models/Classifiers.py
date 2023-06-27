@@ -5,9 +5,9 @@ import numpy as np
 from torch.utils.data import Dataset
 
 ### MODELS ###
-class Baseline_classifier(nn.Module):
+class BaselineClassifier(nn.Module):
     def __init__(self, num_features, init_param):
-        super(Baseline_classifier, self).__init__()
+        super(BaselineClassifier, self).__init__()
 
         self.classifier = nn.Sequential(
             nn.Linear(num_features, init_param),
@@ -41,15 +41,16 @@ class Baseline_classifier(nn.Module):
             nn.BatchNorm1d(int(init_param/64)),
             nn.ReLU(),
             nn.Linear(int(init_param/64), 2)
-)
+        )
 
     def forward(self, x):
         x = self.classifier(x)
         return x
-    
-class Simple_classifier(nn.Module):
+
+
+class SimpleClassifier(nn.Module):
     def __init__(self, num_features):
-        super(Simple_classifier, self).__init__()
+        super(SimpleClassifier, self).__init__()
 
         self.classifier = nn.Sequential(
             nn.Linear(num_features, num_features),
@@ -61,6 +62,7 @@ class Simple_classifier(nn.Module):
     def forward(self, x):
         x = self.classifier(x)
         return x
+
 
 ### LOSS FUNCTION ###
 class FocalLoss(nn.Module):
@@ -83,29 +85,34 @@ class FocalLoss(nn.Module):
             return focal_loss.sum()
         else:
             return focal_loss
+        
+
+class DWBLoss(nn.Module):
+    def __init__(self, labels):
+        super(DWBLoss, self).__init__()
+        self.class_weights = self.get_class_weights(labels)
+
+    def get_class_weights(self, labels):
+        class_counts = torch.bincount(labels)
+        max_class_count = torch.max(class_counts)
+        class_weights = torch.log(max_class_count / class_counts) + 1
+        return class_weights
+
+    def forward(self, logits, targets):
+
+        class_probabilities = F.softmax(logits, dim=1)
+        log_class_probabilities = F.log_softmax(logits, dim=1)
+        one_hot_targets = F.one_hot(targets, num_classes=logits.size(1))
+
+        loss = torch.mean(
+            -self.class_weights.pow(1 - class_probabilities) * one_hot_targets * log_class_probabilities
+        ) - torch.mean(class_probabilities * (1 - class_probabilities))
+
+        return loss
+
 
 ### DATASETS ###
-class TableDatasetPath(Dataset):
-    def __init__(self, path):
-        self.data = np.genfromtxt(path, delimiter=',', skip_header=1)
-        self.features = self.data[:, :-1]
-        self.labels = self.data[:, -1]
-
-        mean = np.mean(self.features, axis=0)
-        std = np.std(self.features, axis=0)
-
-        self.features = (self.features - mean) / std
-    
-    def __len__(self):
-        return len(self.data)
-    
-    def __getitem__(self, idx):
-        x = torch.tensor(self.features[idx], dtype=torch.float32)
-        y = torch.tensor(self.labels[idx], dtype=torch.long)
-        return x, y
-
-
-class TableDatasetDF(Dataset):
+class ClassifierDataset(Dataset):
     def __init__(self, data):
         self.data = np.array(data)
         self.features = self.data[:, :-1]

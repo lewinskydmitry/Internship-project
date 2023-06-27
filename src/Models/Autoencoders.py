@@ -5,6 +5,7 @@ import numpy as np
 from torch.utils.data import Dataset
 import copy
 
+
 def create_mirror_layers(layers):
     mirror_modules = []
     for module in reversed(layers):
@@ -14,6 +15,7 @@ def create_mirror_layers(layers):
             mirror_modules.append(module)
     return nn.Sequential(*mirror_modules)
 
+
 ### MODELS ###
 class Autoencoder(nn.Module):
     def __init__(self, encoder, latent_space = None):
@@ -22,7 +24,7 @@ class Autoencoder(nn.Module):
         if latent_space != None:
             self.encoder[-1] = nn.Linear(self.encoder[-1].in_features, latent_space)
         self.decoder = create_mirror_layers(self.encoder)
-        
+
         
     def forward(self, x):
         x = self.encoder(x)
@@ -63,8 +65,9 @@ class VAE(nn.Module):
         recon_x = self.decode(z)
         return recon_x, mean, logvar
 
+
 ### LOSS FUNCTION ###
-class Encoder_loss:
+class EncoderLoss:
     def __init__(self, loss):
         self.loss = loss
         
@@ -73,7 +76,8 @@ class Encoder_loss:
         
         return out, {'loss': out.item()}
     
-class vae_loss:  
+
+class VaeLoss:  
     def __init__(self, loss):
         self.loss = loss
           
@@ -81,6 +85,7 @@ class vae_loss:
         out = self.loss(recon_x, mean, logvar, x)
         
         return out, {'loss': out.item()}
+
 
 def vae_loss_function(recon_x, mean, logvar, x):
     # Reconstruction losss
@@ -94,6 +99,7 @@ def vae_loss_function(recon_x, mean, logvar, x):
     total_loss = reconstruction_loss + kl_divergence_loss*10e-4
 
     return total_loss
+
 
 ### DATASETS ###
 class EncoderDataset(Dataset):
