@@ -5,15 +5,15 @@ from imblearn.under_sampling import OneSidedSelection
 
 class DataSampler():
     def __init__(self, X, y) -> None:
-        self.X = X
-        self.y = y
-        self.data = {}
+        pass
+
 
     def copy_data(self, X, y):
         return np.array(X).copy(), np.array(y).copy()
 
-    def ROS(self, p=1.):
-        X, y = self.copy_data(self.X, self.y)
+
+    def ROS(self, X, y, p=1.):
+        X, y = self.copy_data(X, y)
 
         class_counts = np.bincount(y)
         minority_class = np.argmin(class_counts)
@@ -29,12 +29,12 @@ class DataSampler():
 
         ROS_data = np.concatenate((X_oversampled, y_oversampled), axis = 1)
         np.random.shuffle(ROS_data)
-        self.data['ROS_data'] = ROS_data
 
         return ROS_data
     
-    def RUS(self, p=1.):
-        X, y = self.copy_data(self.X, self.y)
+
+    def RUS(self, X, y, p=1.):
+        X, y = self.copy_data(X, y)
 
         class_counts = np.bincount(y)
         minority_class = np.argmin(class_counts)
@@ -50,35 +50,27 @@ class DataSampler():
 
         RUS_data = np.concatenate((X_undersampled, y_undersampled), axis = 1)
         np.random.shuffle(RUS_data)
-        self.data['RUS_data'] = RUS_data
 
         return RUS_data
 
-    def SMOTE(self, p = 1.):
+
+    def SMOTE(self, X, y, p = 1.):
         X, y = self.copy_data(self.X, self.y)
         sm = SMOTE(random_state=42, sampling_strategy = p) # type: ignore
         X_res, y_res = sm.fit_resample(X, y) # type: ignore
         y_res = np.array(y_res).reshape(-1,1)
         SMOTE_data = np.concatenate((X_res, y_res), axis = 1)
         np.random.shuffle(SMOTE_data)
-        self.data['SMOTE_data'] = SMOTE_data
 
         return SMOTE_data
 
-    def OSS(self):
-        X, y = self.copy_data(self.X, self.y)
+
+    def OSS(self, X, y):
+        X, y = self.copy_data(X, y)
         oss = OneSidedSelection(random_state=42)
         X_res, y_res = oss.fit_resample(X, y) # type: ignore
         y_res = np.array(y_res).reshape(-1,1)
         OSS_data = np.concatenate((X_res, y_res), axis = 1)
         np.random.shuffle(OSS_data)
-        self.data['OSS_data'] = OSS_data
 
         return OSS_data
-    
-    def make_data(self,p = 1.):
-        self.ROS(p)
-        self.RUS(p)
-        self.SMOTE(p)
-        self.OSS()
-        
