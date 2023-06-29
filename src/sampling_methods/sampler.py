@@ -9,7 +9,7 @@ def copy_data(X, y):
 class DataSampler():
 
     @staticmethod
-    def ROS(X, y, p=1.):
+    def ROS(X, y, p=1., separation = False):
         X, y = copy_data(X, y)
 
         class_counts = np.bincount(y)
@@ -26,11 +26,13 @@ class DataSampler():
 
         ROS_data = np.concatenate((X_oversampled, y_oversampled), axis = 1)
         np.random.shuffle(ROS_data)
-
-        return ROS_data
+        if separation == False:
+            return ROS_data
+        else:
+             return ROS_data[:,:-1], ROS_data[:,-1]
     
     @staticmethod
-    def RUS(X, y, p=1.):
+    def RUS(X, y, p=1., separation = False):
         X, y = copy_data(X, y)
 
         class_counts = np.bincount(y)
@@ -48,10 +50,13 @@ class DataSampler():
         RUS_data = np.concatenate((X_undersampled, y_undersampled), axis = 1)
         np.random.shuffle(RUS_data)
 
-        return RUS_data
+        if separation == False:
+            return RUS_data
+        else:
+             return RUS_data[:,:-1], RUS_data[:,-1]
 
     @staticmethod
-    def SMOTE(X, y, p = 1.):
+    def SMOTE(X, y, p = 1., separation = False):
         X, y = copy_data(X, y)
         sm = SMOTE(random_state=42, sampling_strategy = p) # type: ignore
         X_res, y_res = sm.fit_resample(X, y) # type: ignore
@@ -59,10 +64,13 @@ class DataSampler():
         SMOTE_data = np.concatenate((X_res, y_res), axis = 1)
         np.random.shuffle(SMOTE_data)
 
-        return SMOTE_data
+        if separation == False:
+            return SMOTE_data
+        else:
+             return SMOTE_data[:,:-1], SMOTE_data[:,-1]
 
     @staticmethod
-    def OSS(X, y):
+    def OSS(X, y, separation = False):
         X, y = copy_data(X, y)
         oss = OneSidedSelection(random_state=42)
         X_res, y_res = oss.fit_resample(X, y) # type: ignore
@@ -70,4 +78,7 @@ class DataSampler():
         OSS_data = np.concatenate((X_res, y_res), axis = 1)
         np.random.shuffle(OSS_data)
 
-        return OSS_data
+        if separation == False:
+            return OSS_data
+        else:
+             return OSS_data[:,:-1], OSS_data[:,-1]
