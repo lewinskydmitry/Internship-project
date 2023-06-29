@@ -30,10 +30,10 @@ class GevNN(nn.Module):
         if self.weighted_model[-1].out_features != self.weighted_model[0].in_features:
             raise ValueError(f"Input and output dimentions of weighted NN should be equal. Now In-{self.weighted_model[-1].out_features}\
                               and out-{self.weighted_model[0].in_features}")
-        
+
         if self.encoder[-1].out_features != self.decoder[0].in_features:
             raise ValueError(f"Dimentions of encoder-decoder don't match")
-        
+
     
     def euclidean_distance(self, A, B):
         euclidean_dist = torch.norm(A - B, dim=1)
