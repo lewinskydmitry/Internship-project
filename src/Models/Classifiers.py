@@ -142,16 +142,6 @@ class DWBLoss(nn.Module):
         ) - torch.mean(class_probabilities * (1 - class_probabilities))
 
         return loss
-    
-
-class CELoss(nn.Module):
-    def __init__(self):
-        super(CELoss, self).__init__()
-
-    def forward(self, target, input):
-        log_softmax = torch.log_softmax(input, dim=1)
-        loss = -torch.mean(torch.sum(log_softmax * target, dim=1))
-        return loss
 
 
 ### DATASETS ###
