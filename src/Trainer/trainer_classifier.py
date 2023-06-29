@@ -165,8 +165,11 @@ class TrainerClassifier:
                 X_batch = X_batch.to(device)
                 y_batch = y_batch.to(device)
                 
-                logits = model(X_batch)
-                loss, cur_metrics = self.loss(logits, y_batch)
+                result = model(X_batch)
+                if isinstance(result, tuple):
+                    loss, cur_metrics = self.loss(result[0], y_batch, *result[1:])
+                else:
+                    loss, cur_metrics = self.loss(result, y_batch)
 
                 for name, value in cur_metrics.items():
                     metrics[name].append(value)
