@@ -25,7 +25,7 @@ class Autoencoder(nn.Module):
             self.encoder[-1] = nn.Linear(self.encoder[-1].in_features, latent_space)
         self.decoder = create_mirror_layers(self.encoder)
 
-        
+
     def forward(self, x):
         x = self.encoder(x)
         x = self.decoder(x)
@@ -67,38 +67,29 @@ class VAE(nn.Module):
 
 
 ### LOSS FUNCTION ###
-class EncoderLoss:
-    def __init__(self, loss):
+class AeLoss:
+    def __init__(self, loss = nn.MSELoss()):
         self.loss = loss
         
     def __call__(self, y_pred, y_true):
         out = self.loss(y_pred, y_true)
         
         return out, {'loss': out.item()}
-    
+
 
 class VaeLoss:  
-    def __init__(self, loss):
+    def __init__(self, loss = nn.MSELoss()):
         self.loss = loss
-          
+
     def __call__(self, recon_x, mean, logvar, x):
-        out = self.loss(recon_x, mean, logvar, x)
-        
+        # Reconstruction losss
+        reconstruction_loss = self.loss(x,recon_x)
+        # KL divergence loss
+        kl_divergence_loss = -0.5 * torch.sum(1 + logvar - mean.pow(2) - logvar.exp())
+        # Total loss
+        out = reconstruction_loss + kl_divergence_loss*10e-4
+
         return out, {'loss': out.item()}
-
-
-def vae_loss_function(recon_x, mean, logvar, x):
-    # Reconstruction losss
-
-    reconstruction_loss = F.mse_loss(x,recon_x)
-
-    # KL divergence loss
-    kl_divergence_loss = -0.5 * torch.sum(1 + logvar - mean.pow(2) - logvar.exp())
-
-    # Total loss
-    total_loss = reconstruction_loss + kl_divergence_loss*10e-4
-
-    return total_loss
 
 
 ### DATASETS ###
