@@ -1,4 +1,5 @@
 import torch
+import torch.nn as nn
 torch.manual_seed(42)
 torch.backends.cudnn.deterministic = True
 
@@ -10,6 +11,15 @@ import wandb
 
 from tqdm import tqdm
 from collections import defaultdict
+
+class Model_class(nn.Module):
+    def __init__(self, model, device):
+        super().__init__()
+        self.model = model
+        self.device = device
+        
+    def __call__(self, x):
+        return self.model(x)
 
 
 class TrainerClassifier:
