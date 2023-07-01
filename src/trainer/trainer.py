@@ -33,6 +33,7 @@ class TrainerClassifier:
                  model_params,
                  optimizer_params,
                  scheduler_params,
+                 additional_params,
                  log=False,
                  wandb_init_params=None,
                  desc=None,
@@ -55,6 +56,7 @@ class TrainerClassifier:
         self.model_params = model_params
         self.optimizer_params = optimizer_params
         self.scheduler_params = scheduler_params
+        self.additional_params = additional_params
 
         # creating a new experiment and log hyperparams
         self.log = log
@@ -71,7 +73,8 @@ class TrainerClassifier:
             self.run = self.log_hyperparams(self.wandb_init_params,
                                             **self.model_params, 
                                             **self.optimizer_params, 
-                                            **self.scheduler_params)
+                                            **self.scheduler_params,
+                                            **self.additional_params)
         # initializing metrics
         self.metrics = None
         self.init_metrics()

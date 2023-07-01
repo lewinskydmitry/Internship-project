@@ -123,16 +123,19 @@ class FocalLoss(nn.Module):
 class DWBLoss(nn.Module):
     def __init__(self, labels):
         super(DWBLoss, self).__init__()
-        self.class_weights = self.get_class_weights(labels)
+        if torch.cuda.is_available():
+            self.class_weights = self.get_class_weights(labels).cuda()
+        else:
+            self.class_weights = self.get_class_weights(labels)
 
     def get_class_weights(self, labels):
+        labels = torch.tensor(np.array(labels))
         class_counts = torch.bincount(labels)
         max_class_count = torch.max(class_counts)
         class_weights = torch.log(max_class_count / class_counts) + 1
         return class_weights
 
     def forward(self, logits, targets):
-
         class_probabilities = F.softmax(logits, dim=1)
         log_class_probabilities = F.log_softmax(logits, dim=1)
         one_hot_targets = F.one_hot(targets, num_classes=logits.size(1))
