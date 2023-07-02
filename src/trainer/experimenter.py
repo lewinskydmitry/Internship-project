@@ -27,7 +27,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
 
-class make_experiments():
+class Experimenter():
 
     def __init__(self, df, parameters = {
         'sampling_methods':[],
@@ -40,7 +40,7 @@ class make_experiments():
         self.init_parameters = 512
 
 
-    def prepare_data(self, p, sampling = None,):
+    def prepare_data(self, sampling = None, p = 0.):
         X_train,X_test,y_train,y_test = train_test_split(self.df.drop(columns=['Machine failure']),
                                                  self.df['Machine failure'],
                                                  shuffle=True,
@@ -80,7 +80,7 @@ class make_experiments():
         return train_dl, val_dl
     
 
-    def setup(self, model, train_dl, val_dl, loss_func, sampling = None, p = 1.):
+    def setup(self, model, train_dl, val_dl, loss_func, sampling = None, p = 0.):
         loss = LossWrapper(loss_func)
         model_factory = partial(Model_class)
         optimizer_factory = partial(torch.optim.AdamW)
@@ -125,15 +125,35 @@ class make_experiments():
         return trainer
 
 
-    def perform_experiment(self):
+    def perform_experiments(self):
         for loss in self.parameters['loss_functions']:
             for sampling in self.parameters['sampling_methods']:
-                for p in self.parameters['p']:
+
+                if sampling not in [None,'OSS'] :
+                    for p in self.parameters['p']:
+                        train_dl, val_dl = self.prepare_data(sampling, p)
+
+                        model = BaselineClassifier(self.num_features, self.init_parameters)
+
+                        learning_params = dict(batch_size=self.batch_size, num_epoch=40)
+                        trainer = self.setup(model, train_dl, val_dl, loss, sampling, p)
+                        trainer.train_model(learning_params)
+                        wandb.finish()
+                elif sampling == 'OSS':
                     train_dl, val_dl = self.prepare_data(sampling, p)
 
                     model = BaselineClassifier(self.num_features, self.init_parameters)
 
                     learning_params = dict(batch_size=self.batch_size, num_epoch=40)
-                    trainer = self.setup(model,train_dl,val_dl,loss,sampling,p)
+                    trainer = self.setup(model, train_dl, val_dl, loss, sampling, p)
+                    trainer.train_model(learning_params)
+                    wandb.finish()
+                else:
+                    train_dl, val_dl = self.prepare_data()
+
+                    model = BaselineClassifier(self.num_features, self.init_parameters)
+
+                    learning_params = dict(batch_size=self.batch_size, num_epoch=40)
+                    trainer = self.setup(model, train_dl, val_dl, loss)
                     trainer.train_model(learning_params)
                     wandb.finish()
