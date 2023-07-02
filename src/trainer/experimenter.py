@@ -104,7 +104,8 @@ class Experimenter():
                                 p = p,
                                 sampling = sampling,
                                 batch_size = self.batch_size,
-                                init_parameters = self.init_parameters)
+                                init_parameters = self.init_parameters,
+                                features_amount = len(self.df))
 
         trainer = TrainerClassifier(train_dl,
                   val_dl,
