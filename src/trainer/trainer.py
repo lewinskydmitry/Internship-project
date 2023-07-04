@@ -33,12 +33,13 @@ class TrainerClassifier:
                  model_params,
                  optimizer_params,
                  scheduler_params,
-                 additional_params,
+                 additional_params = {},
                  log=False,
                  wandb_init_params=None,
                  desc=None,
                  model_dir=None,
-                 saving_model = False):
+                 saving_model = False,
+                 ):
         """
             Class for entire model training and validation process.
             It implements an initialization of the model, optimizer and scheduler.
