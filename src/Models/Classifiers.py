@@ -4,12 +4,13 @@ from sklearn import metrics
 import torch.nn.functional as F
 import numpy as np
 from torch.utils.data import Dataset
+torch.manual_seed(42)
+
 
 ### MODELS ###
 class BaselineClassifier(nn.Module):
     def __init__(self, num_features, init_param):
         super(BaselineClassifier, self).__init__()
-
         self.classifier = nn.Sequential(
             nn.Linear(num_features, init_param),
             nn.BatchNorm1d(init_param),
@@ -44,9 +45,18 @@ class BaselineClassifier(nn.Module):
             nn.Linear(int(init_param/64), 2)
         )
 
+        self._initialize_weights()
+
     def forward(self, x):
         x = self.classifier(x)
         return x
+    
+    def _initialize_weights(self):
+        for module in self.modules():
+            torch.manual_seed(42)
+            if isinstance(module, nn.Linear):
+                nn.init.xavier_uniform_(module.weight)
+                nn.init.constant_(module.bias, 0.0)
 
 
 class SimpleClassifier(nn.Module):
