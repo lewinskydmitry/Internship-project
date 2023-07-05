@@ -17,15 +17,11 @@ from src.sampling_methods.sampler import DataSampler
 seed_value = 42
 torch.manual_seed(seed_value)
 torch.cuda.manual_seed_all(seed_value)
-generator = torch.Generator()
-generator.manual_seed(seed_value)
 torch.backends.cudnn.deterministic = True
 
 from functools import partial
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
-
 
 class Experimenter():
 
@@ -62,6 +58,9 @@ class Experimenter():
         df_test = pd.concat([X_test, y_test], axis = 1)
         train_dataset = ClassifierDataset(df_train)
         val_dataset = ClassifierDataset(df_test)
+
+        generator = torch.Generator()
+        generator.manual_seed(seed_value)
 
         train_dl = DataLoader(
             train_dataset,
@@ -151,43 +150,6 @@ class Experimenter():
                     model = BaselineClassifier(self.num_features, self.init_parameters)
 
                     learning_params = dict(batch_size=self.batch_size, num_epoch=40)
-                    loss = LossWrapper(loss)
-                    model_factory = partial(Model_class)
-                    optimizer_factory = partial(torch.optim.AdamW)
-                    scheduler_factory = partial(lr.ExponentialLR)
-
-                    model_params = dict(model=model,
-                                        device=device)
-
-                    optimizer_params = dict(weight_decay=1e-3, lr=1e-2)
-                    scheduler_params = dict(gamma=0.90)
-
-                    wandb_init_params = dict(
-                        name=f'EM_{loss.__dict__["loss"]}_{sampling}-{0}',
-                        project="Internship_project",
-                        dir = '../logs/')
-
-                    additional_params = dict(loss = loss,
-                                            p = 0,
-                                            sampling = sampling,
-                                            batch_size = self.batch_size,
-                                            init_parameters = self.init_parameters,
-                                            features_amount = self.df.shape[1])
-
-                    trainer = TrainerClassifier(train_dl,
-                            val_dl,
-                            loss,
-                            model_factory=model_factory,
-                            optimizer_factory=optimizer_factory,
-                            scheduler_factory=scheduler_factory,
-                            model_params=model_params,
-                            optimizer_params=optimizer_params,
-                            scheduler_params=scheduler_params,
-                            additional_params = additional_params,
-                            log=True,
-                            wandb_init_params=wandb_init_params,
-                            model_dir='../logs/nn_models/classifier/',
-                            saving_model=False
-                            )
+                    trainer = self.setup(model, train_dl, val_dl, loss)
                     trainer.train_model(learning_params)
                     wandb.finish()
