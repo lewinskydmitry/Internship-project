@@ -1,11 +1,6 @@
 import torch
 import torch.nn as nn
-torch.manual_seed(42)
-torch.backends.cudnn.deterministic = True
-
 import numpy as np
-np.random.seed(42)
-
 import time
 import wandb
 

@@ -14,36 +14,32 @@ from src.models.classifiers import *
 from src.trainer.trainer import TrainerClassifier, Model_class
 from src.sampling_methods.sampler import DataSampler
 
-seed_value = 42
-torch.manual_seed(seed_value)
-torch.cuda.manual_seed_all(seed_value)
-torch.backends.cudnn.deterministic = True
-
 from functools import partial
-
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
 
 class Experimenter():
 
     def __init__(self, df, parameters = {
         'sampling_methods':[],
         'loss_functions':[nn.CrossEntropyLoss()],
-        'p':[0.1,0.2]}, batch_size = 1024):
+        'p':[0.1,0.2]}, batch_size = 1024, random_seed = 42):
         self.df = df
         self.num_features = df.shape[1]-1
         self.parameters = parameters
         self.batch_size = batch_size
         self.init_parameters = 512
+        self.random_seed = random_seed
 
 
     def prepare_data(self, sampling = 'None', p = 0.):
         X_train, X_test, y_train, y_test = train_test_split(self.df.drop(columns=['Machine failure']),
                                                  self.df['Machine failure'],
                                                  shuffle=True,
-                                                 stratify=self.df['Machine failure'], random_state=42,
+                                                 stratify=self.df['Machine failure'], random_state=self.random_seed,
                                                  train_size=0.7)
         if sampling != 'None':
-            sampler = DataSampler()
+            sampler = DataSampler(self.random_seed)
             if sampling == 'ROS':
                 df_train = sampler.ROS(X_train, y_train, p)
             elif sampling == 'RUS':
@@ -60,7 +56,7 @@ class Experimenter():
         val_dataset = ClassifierDataset(df_test)
 
         generator = torch.Generator()
-        generator.manual_seed(seed_value)
+        generator.manual_seed(self.random_seed)
 
         train_dl = DataLoader(
             train_dataset,
@@ -101,7 +97,8 @@ class Experimenter():
                                 sampling = sampling,
                                 batch_size = self.batch_size,
                                 init_parameters = self.init_parameters,
-                                features_amount = self.df.shape[1])
+                                features_amount = self.df.shape[1],
+                                random_seed = self.random_seed)
 
         trainer = TrainerClassifier(train_dl,
                   val_dl,
@@ -129,7 +126,7 @@ class Experimenter():
                     for p in self.parameters['p']:
                         train_dl, val_dl = self.prepare_data(sampling, p)
 
-                        model = BaselineClassifier(self.num_features, self.init_parameters)
+                        model = BaselineClassifier(self.num_features, self.init_parameters, random_seed = self.random_seed)
 
                         learning_params = dict(batch_size=self.batch_size, num_epoch=40)
                         trainer = self.setup(model, train_dl, val_dl, loss, sampling, p)

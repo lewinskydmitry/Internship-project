@@ -4,12 +4,11 @@ from sklearn import metrics
 import torch.nn.functional as F
 import numpy as np
 from torch.utils.data import Dataset
-torch.manual_seed(42)
 
 
 ### MODELS ###
 class BaselineClassifier(nn.Module):
-    def __init__(self, num_features, init_param):
+    def __init__(self, num_features, init_param, random_seed = 42):
         super(BaselineClassifier, self).__init__()
         self.classifier = nn.Sequential(
             nn.Linear(num_features, init_param),
@@ -44,6 +43,7 @@ class BaselineClassifier(nn.Module):
             nn.ReLU(),
             nn.Linear(int(init_param/64), 2)
         )
+        self.random_seed = random_seed
 
         self._initialize_weights()
 
@@ -53,7 +53,7 @@ class BaselineClassifier(nn.Module):
     
     def _initialize_weights(self):
         for module in self.modules():
-            torch.manual_seed(42)
+            torch.manual_seed(self.random_seed)
             if isinstance(module, nn.Linear):
                 nn.init.xavier_uniform_(module.weight)
                 nn.init.constant_(module.bias, 0.0)

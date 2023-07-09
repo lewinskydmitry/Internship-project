@@ -1,4 +1,3 @@
-import copy
 import numpy as np
 from imblearn.over_sampling import SMOTE
 from imblearn.under_sampling import OneSidedSelection
@@ -7,9 +6,12 @@ def copy_data(X, y):
         return np.array(X).copy(), np.array(y).copy()
 
 class DataSampler():
+    def __init__(self, random_seed):
+         self.random_seed = random_seed
+         np.random.seed(random_seed)
 
-    @staticmethod
-    def ROS(X, y, p=1., separation = False):
+
+    def ROS(self, X, y, p=1., separation = False):
         X, y = copy_data(X, y)
 
         class_counts = np.bincount(y)
@@ -31,8 +33,8 @@ class DataSampler():
         else:
              return ROS_data[:,:-1], ROS_data[:,-1]
     
-    @staticmethod
-    def RUS(X, y, p=1., separation = False):
+
+    def RUS(self, X, y, p=1., separation = False):
         X, y = copy_data(X, y)
 
         class_counts = np.bincount(y)
@@ -55,10 +57,10 @@ class DataSampler():
         else:
              return RUS_data[:,:-1], RUS_data[:,-1]
 
-    @staticmethod
-    def SMOTE(X, y, p = 1., separation = False):
+
+    def SMOTE(self, X, y, p = 1., separation = False):
         X, y = copy_data(X, y)
-        sm = SMOTE(random_state=42, sampling_strategy = p) # type: ignore
+        sm = SMOTE(random_state=self.random_seed, sampling_strategy = p) # type: ignore
         X_res, y_res = sm.fit_resample(X, y) # type: ignore
         y_res = np.array(y_res).reshape(-1,1)
         SMOTE_data = np.concatenate((X_res, y_res), axis = 1)
@@ -69,10 +71,10 @@ class DataSampler():
         else:
              return SMOTE_data[:,:-1], SMOTE_data[:,-1]
 
-    @staticmethod
-    def OSS(X, y, separation = False):
+
+    def OSS(self, X, y, separation = False):
         X, y = copy_data(X, y)
-        oss = OneSidedSelection(random_state=42)
+        oss = OneSidedSelection(random_state=self.random_seed)
         X_res, y_res = oss.fit_resample(X, y) # type: ignore
         y_res = np.array(y_res).reshape(-1,1)
         OSS_data = np.concatenate((X_res, y_res), axis = 1)
