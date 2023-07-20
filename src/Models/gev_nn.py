@@ -1,22 +1,21 @@
+import os
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname('src'), '..')))
+
+from src.models.autoencoders import create_mirror_layers
+
 import torch.nn as nn
 from torch.nn.functional import cosine_similarity
-from sklearn import metrics
 import torch
 import copy
-
-def create_mirror_layers(layers):
-    mirror_modules = []
-    for module in reversed(layers):
-        if isinstance(module, nn.Linear):
-            mirror_modules.append(nn.Linear(module.out_features, module.in_features))
-        else:
-            mirror_modules.append(module)
-    return nn.Sequential(*mirror_modules)
+import warnings
 
 
 class GevNN(nn.Module):
     def __init__(self, encoder, weighted_model, main_classifier, latent_space = None):
         super(GevNN, self).__init__()
+
+        # Copy nn.Sequential for model parts
         self.weighted_model = copy.deepcopy(weighted_model)
         self.main_classifier = copy.deepcopy(main_classifier)
 
@@ -26,23 +25,33 @@ class GevNN(nn.Module):
             self.encoder[-1] = nn.Linear(self.encoder[-1].in_features, latent_space)
         self.decoder = create_mirror_layers(self.encoder)
 
-        # match dimentions of initial models
+        # Check that dimentions are correct
+        ############################################################################
         if self.weighted_model[-1].out_features != self.weighted_model[0].in_features:
             raise ValueError(f"Input and output dimentions of weighted NN should be equal. Now In-{self.weighted_model[-1].out_features}\
                               and out-{self.weighted_model[0].in_features}")
 
         if self.encoder[-1].out_features != self.decoder[0].in_features:
             raise ValueError(f"Dimentions of encoder-decoder don't match")
+        
+        concat_dim = self.encoder[-1].out_features + weighted_model[0].in_features + 2
+        
+        if self.main_classifier[0].in_features != concat_dim:
+            warnings.warn("Dimentions for input of main_classifier is changed because of mismatch")
+            self.main_classifier[0] = nn.Linear(concat_dim, main_classifier[0].out_features)
+        ############################################################################
 
-    
+
     def euclidean_distance(self, A, B):
         euclidean_dist = torch.norm(A - B, dim=1)
+        euclidean_dist = euclidean_dist.reshape(-1,1)
         return euclidean_dist
     
 
     def cosine_distance(self, A, B):
         cosine_sim = cosine_similarity(A, B)
         cosine_dist = 1 - cosine_sim
+        cosine_dist = cosine_dist.reshape(-1,1)
         return cosine_dist
 
 
@@ -53,18 +62,20 @@ class GevNN(nn.Module):
         restored_x = self.decoder(latent_space)
         cos_dist = self.cosine_distance(x, restored_x)
         euclid_dist = self.euclidean_distance(x, restored_x)
-        final_input = torch.concatenate([selected_input, latent_space, cos_dist, euclid_dist])
+        final_input = torch.concatenate([selected_input, latent_space, cos_dist, euclid_dist],dim=1)
         output = self.main_classifier(final_input)
-        return output, restored_x
+        return output, x, restored_x
     
 
-class GevLoss:
+class GevLoss(nn.Module):
     def __init__(self, loss_classif):
+        super(GevLoss, self).__init__()
         self.loss_classif = loss_classif
+        self.rest_loss = nn.MSELoss()
           
-    def __call__(self,  y_pred, y_true, x, restored_x):
+    def forward(self,  y_pred, y_true, x, restored_x):
         classif_loss = self.loss_classif( y_pred, y_true)
-        ae_loss = nn.MSELoss(x, restored_x)
-        out = classif_loss + ae_loss
+        ae_loss = self.rest_loss(x, restored_x)  
+        out = torch.mean(classif_loss + ae_loss)
 
-        return out, {'loss': out.item()}
+        return out

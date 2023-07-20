@@ -135,7 +135,7 @@ class Experimenter():
                 elif sampling == 'OSS':
                     train_dl, val_dl = self.prepare_data(sampling)
 
-                    model = BaselineClassifier(self.num_features, self.init_parameters)
+                    model = BaselineClassifier(self.num_features, self.init_parameters, random_seed = self.random_seed)
 
                     learning_params = dict(batch_size=self.batch_size, num_epoch=40)
                     trainer = self.setup(model, train_dl, val_dl, loss, sampling)
@@ -144,7 +144,7 @@ class Experimenter():
                 else:
                     train_dl, val_dl = self.prepare_data()
 
-                    model = BaselineClassifier(self.num_features, self.init_parameters)
+                    model = BaselineClassifier(self.num_features, self.init_parameters, random_seed = self.random_seed)
 
                     learning_params = dict(batch_size=self.batch_size, num_epoch=40)
                     trainer = self.setup(model, train_dl, val_dl, loss)
