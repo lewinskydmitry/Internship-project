@@ -2,9 +2,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
-from torch.utils.data import Dataset
+from torch.utils.data import Dataset, DataLoader
 import pandas as pd
-from torch.utils.data import DataLoader
 
 random_seed = 42
 torch.manual_seed(random_seed)
