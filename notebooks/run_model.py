@@ -66,56 +66,51 @@ class BaselineClassifier(nn.Module):
             if isinstance(module, nn.Linear):
                 nn.init.xavier_uniform_(module.weight)
                 nn.init.constant_(module.bias, 0.0)
-
-
-class ClassifierDataset(Dataset):
-    def __init__(self, data):
-        self.data = np.array(data)
-        self.features = self.data[:, :-1]
-        self.labels = self.data[:, -1]
-
-        mean = np.mean(self.features, axis=0)
-        std = np.std(self.features, axis=0)
-
-        self.features = (self.features - mean) / std
-    
-    def __len__(self):
-        return len(self.data)
-    
-    def __getitem__(self, idx):
-        x = torch.tensor(self.features[idx], dtype=torch.float32)
-        y = torch.tensor(self.labels[idx], dtype=torch.long)
-        return x, y
     
 
+
+
+# Loading data for testing
 df_train = pd.read_csv('data/prepared_data.csv')
-features_amount = df_train.shape[1] - 1
+df_train = df_train.drop(columns = ['Machine failure'])
+df_train = torch.tensor(df_train.values, dtype=torch.float32)
+df_train = df_train.to(device)
 
-# Initial parameters 
-INIT_PARAM = 512
-BATCH_SIZE = 1024
 
-# Create model
-model = BaselineClassifier(features_amount, INIT_PARAM)
+INIT_PARAM = 512 # Initial parameters 
+features_amount = df_train.shape[1]
 
-# Create dataset and dataloader
-train_dataset = ClassifierDataset(df_train)
-train_dl = DataLoader(
-    train_dataset,
-    batch_size=BATCH_SIZE, 
-    shuffle=True,
-    generator=generator
-)
-
-# Load weights of the trained model
+# Initialize model
+model = BaselineClassifier(features_amount, INIT_PARAM) # Create model
 model_weights_path = 'logs/classifiers/BL_512_1024_state_dict.pth'
-model.load_state_dict(torch.load(model_weights_path))
-
-model.to(device)
+model.load_state_dict(torch.load(model_weights_path)) # Load weights of the trained model
+model = model.to(device)
 model.eval()
 
-# Take output
-with torch.no_grad():
-    for X_batch, y_batch in train_dl:
-        X_batch = X_batch.to(device)
-        result = model(X_batch)
+
+
+# Functions for testing :
+
+def get_data(df):
+    """
+    This function simulates that we take the one row of the data
+    """
+    idx = np.random.randint(0, len(df))
+    one_row_data = df_train[idx,:].reshape(1,-1)
+    one_row_data = one_row_data.to(device)
+    return one_row_data
+
+
+def return_pred(one_row_data):
+    """
+    This function takes one row of the data and return prediction
+    """
+    # Take output
+    with torch.no_grad():
+        result = model(one_row_data)
+    return result
+
+# testing result
+one_row_data = get_data(df_train)
+result = return_pred(one_row_data)
+print(result)
