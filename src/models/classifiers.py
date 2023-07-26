@@ -166,10 +166,10 @@ class ClassifierDataset(Dataset):
         self.features = self.data[:, :-1]
         self.labels = self.data[:, -1]
 
-        mean = np.mean(self.features, axis=0)
-        std = np.std(self.features, axis=0)
+        # mean = np.mean(self.features, axis=0)
+        # std = np.std(self.features, axis=0)
 
-        self.features = (self.features - mean) / std
+        # self.features = (self.features - mean) / std
     
     def __len__(self):
         return len(self.data)

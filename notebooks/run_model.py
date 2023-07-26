@@ -67,35 +67,18 @@ class BaselineClassifier(nn.Module):
                 nn.init.xavier_uniform_(module.weight)
                 nn.init.constant_(module.bias, 0.0)
     
-# Dataset class for pytorch
-class ClassifierDataset(Dataset):
-    def __init__(self, data):
-        self.data = np.array(data)
-        self.features = self.data[:, :-1]
-        self.labels = self.data[:, -1]
 
-        mean = np.mean(self.features, axis=0)
-        std = np.std(self.features, axis=0)
-
-        self.features = (self.features - mean) / std
-    
-    def __len__(self):
-        return len(self.data)
-    
-    def __getitem__(self, idx):
-        x = torch.tensor(self.features[idx], dtype=torch.float32)
-        y = torch.tensor(self.labels[idx], dtype=torch.long)
-        return x, y
 
 
 # Loading data for testing
 df_train = pd.read_csv('data/prepared_data.csv')
-df_train = torch.tensor(df_train.values)
-df_train = ClassifierDataset(df_train)
+df_train = df_train.drop(columns = ['Machine failure'])
+df_train = torch.tensor(df_train.values, dtype=torch.float32)
+df_train = df_train.to(device)
 
 
 INIT_PARAM = 512 # Initial parameters 
-features_amount = df_train.data.shape[1] - 1
+features_amount = df_train.shape[1]
 
 # Initialize model
 model = BaselineClassifier(features_amount, INIT_PARAM) # Create model
@@ -105,6 +88,7 @@ model = model.to(device)
 model.eval()
 
 
+
 # Functions for testing :
 
 def get_data(df):
@@ -112,10 +96,9 @@ def get_data(df):
     This function simulates that we take the one row of the data
     """
     idx = np.random.randint(0, len(df))
-    X, y = df_train.__getitem__(idx)
-    X = X.reshape(1,-1)
-    X = X.to(device)
-    return X
+    one_row_data = df_train[idx,:].reshape(1,-1)
+    one_row_data = one_row_data.to(device)
+    return one_row_data
 
 
 def return_pred(one_row_data):
