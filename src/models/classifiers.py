@@ -4,6 +4,8 @@ from sklearn import metrics
 import torch.nn.functional as F
 import numpy as np
 from torch.utils.data import Dataset
+from sklearn.preprocessing import StandardScaler
+import joblib
 
 
 ### MODELS ###
@@ -165,6 +167,12 @@ class ClassifierDataset(Dataset):
         self.data = np.array(data)
         self.features = self.data[:, :-1]
         self.labels = self.data[:, -1]
+
+        # Use scaler instead of custom one
+        scaler = StandardScaler()
+        scaler.fit(self.features)
+        self.features = scaler.transform(self.features)
+        joblib.dump(scaler, '../logs/classifiers/scaler.pkl')
 
         # mean = np.mean(self.features, axis=0)
         # std = np.std(self.features, axis=0)
