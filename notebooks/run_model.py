@@ -76,9 +76,10 @@ class BaselineClassifier(nn.Module):
 # Loading data for testing
 df_train = pd.read_csv('data/prepared_data.csv')
 df_train = df_train.drop(columns = ['Machine failure'])
-df_train = np.array(df_train)
-# df_train = torch.tensor(df_train.values, dtype=torch.float32)
-# df_train = df_train.to(device)
+scaler = joblib.load('C:/Users/dimaf/Documents/GitHub/Internship-project/logs/classifiers/scaler.pkl') 
+df_train = scaler.transform(df_train)
+df_train = torch.tensor(df_train, dtype=torch.float32)
+df_train = df_train.to(device)
 
 
 INIT_PARAM = 512 # Initial parameters 
@@ -94,7 +95,7 @@ model.eval()
 
 
 # Functions for testing :
-scaler = joblib.load('C:/Users/dimaf/Documents/GitHub/Internship-project/logs/classifiers/scaler.pkl') 
+
 
 def get_data(df):
     """
@@ -102,8 +103,6 @@ def get_data(df):
     """
     idx = np.random.randint(0, len(df))
     one_row_data = df_train[idx,:].reshape(1,-1)
-    one_row_data = scaler.transform(one_row_data)
-    one_row_data = torch.tensor(one_row_data, dtype=torch.float32)
     one_row_data.to(device)
     return one_row_data
 

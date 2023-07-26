@@ -146,8 +146,8 @@ class Prediction(AbstractBaseExecutor) :
         df = df.reindex(columns=self.columns_order)
         # Use the trained scaler
         df = self.scaler.transform(df)
-        
-        tensor_data = torch.tensor(df.values, dtype=torch.float32)
+
+        tensor_data = torch.tensor(df, dtype=torch.float32)
         tensor_data = tensor_data.to(self.device)
         logging.debug("tensor_data {}".format(tensor_data))
         #run a prediction
