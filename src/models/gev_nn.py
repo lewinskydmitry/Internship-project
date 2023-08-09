@@ -11,6 +11,13 @@ import copy
 import warnings
 
 
+class GevActivation(nn.Module):
+    def __init__(self):
+        super(GevActivation, self).__init__()
+
+    def forward(self, x):
+        return torch.exp(-torch.exp(-x))
+
 class GevNN(nn.Module):
     def __init__(self, encoder, weighted_model, main_classifier, latent_space = None):
         super(GevNN, self).__init__()
@@ -40,6 +47,7 @@ class GevNN(nn.Module):
             warnings.warn("Dimentions for input of main_classifier is changed because of mismatch")
             self.main_classifier[0] = nn.Linear(concat_dim, main_classifier[0].out_features)
         ############################################################################
+        self.gev_activation = GevActivation()
 
 
     def euclidean_distance(self, A, B):
@@ -62,19 +70,20 @@ class GevNN(nn.Module):
         restored_x = self.decoder(latent_space)
         cos_dist = self.cosine_distance(x, restored_x)
         euclid_dist = self.euclidean_distance(x, restored_x)
-        final_input = torch.concatenate([selected_input, latent_space, cos_dist, euclid_dist],dim=1)
+        final_input = torch.concatenate([selected_input, latent_space, cos_dist, euclid_dist], dim=1)
         output = self.main_classifier(final_input)
+        output = self.gev_activation(output)
         return output, x, restored_x
-    
+
 
 class GevLoss(nn.Module):
     def __init__(self, loss_classif):
         super(GevLoss, self).__init__()
         self.loss_classif = loss_classif
         self.rest_loss = nn.MSELoss()
-          
-    def forward(self,  y_pred, y_true, x, restored_x):
-        classif_loss = self.loss_classif( y_pred, y_true)
+
+    def forward(self, y_pred, y_true, x, restored_x):
+        classif_loss = self.loss_classif(y_pred, y_true.float())
         ae_loss = self.rest_loss(x, restored_x)  
         out = torch.mean(classif_loss + ae_loss)
 

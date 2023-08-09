@@ -77,26 +77,48 @@ class SimpleClassifier(nn.Module):
 
 ### LOSS FUNCTION ###
 class LossWrapper:
-    def __init__(self, loss):
+    def __init__(self, loss, gev = False):
         self.loss = loss
+        self.gev = gev
 
     def __call__(self, y_pred, y_true, *args, **kwargs):
-        y_pred = torch.softmax(y_pred, dim=1)
-        out = self.loss(y_pred, y_true, *args, **kwargs)
-        accuracy = (y_pred.argmax(dim=1) == y_true).float().mean()
-        f1_sc = metrics.fbeta_score(y_true.cpu(), y_pred.argmax(dim=1).cpu(), beta=1, average='weighted')
-        f2_sc = metrics.fbeta_score(y_true.cpu(), y_pred.argmax(dim=1).cpu(), beta=2, average='weighted')
-        y_pred = y_pred.detach().cpu().numpy()
-        y_true = y_true.cpu().numpy()
-        fpr, tpr, _ = metrics.roc_curve(y_true, y_pred[:, 1])
-        auc_score = metrics.auc(fpr, tpr)
+        if self.gev == False:
+            y_pred = torch.softmax(y_pred, dim=1)
+            out = self.loss(y_pred, y_true, *args, **kwargs)
+            accuracy = (y_pred.argmax(dim=1) == y_true).float().mean()
+            f1_sc = metrics.fbeta_score(y_true.cpu(), y_pred.argmax(dim=1).cpu(), beta=1, average='weighted')
+            f2_sc = metrics.fbeta_score(y_true.cpu(), y_pred.argmax(dim=1).cpu(), beta=2, average='weighted')
+            y_pred = y_pred.detach().cpu().numpy()
+            y_true = y_true.cpu().numpy()
+            fpr, tpr, _ = metrics.roc_curve(y_true, y_pred[:, 1])
+            auc_score = metrics.auc(fpr, tpr)
 
-        tp = ((y_pred[:, 1] >= 0.5) & (y_true == 1)).sum()
-        fp = ((y_pred[:, 1] >= 0.5) & (y_true == 0)).sum()
-        tn = ((y_pred[:, 1] < 0.5) & (y_true == 0)).sum()
-        fn = ((y_pred[:, 1] < 0.5) & (y_true == 1)).sum()
-        tpr = tp / (tp + fn)
-        fpr = fp / (fp + tn)
+            tp = ((y_pred[:, 1] >= 0.5) & (y_true == 1)).sum()
+            fp = ((y_pred[:, 1] >= 0.5) & (y_true == 0)).sum()
+            tn = ((y_pred[:, 1] < 0.5) & (y_true == 0)).sum()
+            fn = ((y_pred[:, 1] < 0.5) & (y_true == 1)).sum()
+
+            tpr = tp / (tp + fn)
+            fpr = fp / (fp + tn)
+        else:
+            y_true = y_true.reshape(-1,1)
+            out = self.loss(y_pred, y_true, *args, **kwargs)
+            accuracy = ((y_pred >=0.5) == y_true).float().mean()
+            f1_sc = metrics.fbeta_score(y_true.cpu(), (y_pred >=0.5).cpu(), beta=1, average='weighted')
+            f2_sc = metrics.fbeta_score(y_true.cpu(), (y_pred >=0.5).cpu(), beta=2, average='weighted')
+            y_pred = y_pred.detach().cpu().numpy()
+            y_true = y_true.cpu().numpy()
+            fpr, tpr, _ = metrics.roc_curve(y_true, y_pred)
+            auc_score = metrics.auc(fpr, tpr)
+
+            tp = ((y_pred >= 0.5) & (y_true == 1)).sum()
+            
+            fp = ((y_pred >= 0.5) & (y_true == 0)).sum()
+            tn = ((y_pred < 0.5) & (y_true == 0)).sum()
+            fn = ((y_pred < 0.5) & (y_true == 1)).sum()
+
+            tpr = tp / (tp + fn)
+            fpr = fp / (fp + tn)
 
         return out, {
             'loss': out.item(),
